@@ -1,0 +1,233 @@
+<HTML>
+<HEAD>
+  <TITLE> Introductory Guide to the BioGate System</TITLE>
+</HEAD>
+<BODY>
+<H1>
+  Introductory Guide to the BioGate System
+</H1>
+<P>
+Welcome to the BioGate system, a web interface for MOOs. This document will
+give you some quick introductory information on using the BioGate system.
+Detailed instructions for connecting to the MOO's web system will be found
+on the MOO's Web Gateway page. There is a section below, however, on "What
+to do if you can't seem to connect to the MOO's web system." If you are
+unfamiliar with MOOs in general, other information is available elsewhere
+on that subject.
+<P>
+  <HR>
+<FONT SIZE=+1>Contents</FONT>
+<P>
+<A HREF="#Whatis">What is the BioGate system?</A><BR>
+<A HREF="#Howtolook">How do I use the BioGate system to look around the VR
+world?</A><BR>
+<A HREF="#Standardvsghost">What is the difference between using the Standard
+Viewer and the Ghost Viewer?</A><BR>
+<A HREF="#Manipulation">Can I manipulate objects through the web?</A><BR>
+<A HREF="#Imagesandsound">How do I add images and sounds to my own
+objects?</A><BR>
+<A HREF="#Webaware">How can I program objects to be web-aware?</A><BR>
+<A HREF="#Failconnect">What should I do if I can't seem to connect to the
+MOO's web system at all?</A>
+<P>
+  <HR>
+<P>
+<A NAME="Whatis"><FONT SIZE=+1>What is the BioGate system?</FONT></A>
+<P>
+The BioGate system is a set of MOO objects and associated MOO modifications
+that allow the MOO to function as a web server. In addition, some of the
+objects provided are "viewers" that allow you to see into the MOO via web
+pages, much like how the common telnet/client interface gives you a text
+window into the virtual world that is the MOO. The key is that MOOs are not,
+as is often said, text-based virtual reality (VR). It is simply that the
+only means users had for perceiving their VR world was text. The BioGate system
+provides the tools for both adding multimedia information to MOO objects,
+and for allowing users to perceive those objects and their extended associated
+characteristics.
+<P>
+<P>
+<A NAME="Howtolook"><FONT SIZE=+1>How do I use the BioGate system to look
+around the VR world?</FONT></A>
+<P>
+The usual way to get a multimedia window into the MOO is by connecting with
+your own web browser to the Standard Viewer, supplied with the BioGate package.
+It is called "standard" because there is nothing to prevent administrators
+or users from making their own custom viewers, and facilities are provided
+in the BioGate system for allowing users to specify what their default viewer
+will be. The Standard Viewer is typically the user's default viewer when
+they connect unless they've changed it.
+<P>
+One uses the Standard Viewer by first opening an ordinary telnet/client
+connection to the MOO, and then opening a web window via the MOO's Web Gateway
+page (that page has detailed instructions on how to do this). You will usually
+then get a web page produced by the Standard Viewer. There are two major
+reasons to have a text-only window in addition to the multimedia window (the
+minor reason is that the Standard Viewer won't let you use it unless you
+have a text connection open too). First, the text-only window is real time,
+and provides the best system for live conversations with other MOO users.
+To use the MOO as simply a provider of web pages is a waste of one of this
+VR system's greatest strengths: live communication. Second, limitations in
+the current MOO servers make it difficult to automatically add web manipulation
+features to all MOO objects, and instead, such object manipulation must be
+custom designed for each object class. This is expected to be solved by the
+release of the LambdaMOO server version 1.8.0 sometime in the (hopefully
+near) future. Until then, most object manipulation is best performed via
+the telnet window.
+<P>
+Using a viewer to see into the VR world and move around is as simple as any
+other web application: select the hyperlinks you see on the page. Some of
+these are exits and will move you to a new room. When that happens, you'll
+see confirmation of the movement in your text-only window. Other hyperlinks
+are the names of objects, and selecting those will typically lead to a
+description of the object plus any additional multimedia information associated
+with the object. Finally, some links are "administrative" and allow you to
+customize your web page, your character, or other objects you own. Some of
+these lead to new pages with forms to fill out, and others act immediately.
+The best way to find out what the different links do is to try them. Also,
+it's rather fun.
+<P>
+Notice that although the text-only window is updated when you move through
+the MOO using the web window, the web window remains unchanged if you move
+using the text-only window. This is because web pages are obtained by opening
+a connection to the MOO, getting the page, and closing that connection. Once
+the page is retrieved, your web browser and the MOO are not communicating
+(there are exceptions, but this is an introduction). The simplest way to
+update your web window if you've moved using the telnet/client window is
+to select one of the "Look around" links on the web page. That will cause
+the browser to retrieve an updated view of where you are. Note that if you
+have selected some object in the web window and are looking at it, you can
+restore the page to the room's description again by selecting a "Look around"
+link.
+<P>
+You'll notice that the Standard Viewer presents its web page in a consistent
+format. The top of the page has the banner (if any), and possibly a link
+to the web applications list (users can customize their display so this is
+on the bottom). Below that is the "button bar" which has a set of shortcuts
+for performing various functions, including teleporting to important rooms,
+customizing the web page, and other features. Underneath that you'll find
+selectable maps, allowing you to quickly teleport around the MOO (unless
+you've turned them off).
+<P>
+The next major section is the "what's here" part. You'll see a list of what
+objects are in the room with you, a list of what you're carrying (optionally),
+and list of what exits lead from the room (which optionally include the name
+of the destination). Under the "what's here" section is the "focus area."
+This is the part of the page where you see the thing that you're currently
+looking at. When you first enter a room, it will generally show the rooms
+name and description. Note that just to the left of the name is a link to
+the top of the page. When you select an object in the room (from the "what's
+here" section), you'll get a new page with the description of that object
+in the focus area replacing that of the room.
+<P>
+<P>
+<A NAME="Standardvsghost"><FONT SIZE=+1>What is the difference between the
+Standard Viewer and the Ghost Viewer?</FONT></A>
+<P>
+Most of the time, you'll want to use the Standard Viewer to see into the
+MOO. Some people, though, can't open both a telnet/client connection and
+a web connection at the same time. Other people want to see into the MOO,
+but don't need or want to talk with people or manipulate objects. Note that
+you don't need to have a registered character to use the Standard Viewer,
+though, since guests can get a temporary web password to use when opening
+a web window (as described on the MOO's Web Gateway page).
+<P>
+The Ghost Viewer allow uses to see into the MOO without opening a telnet/client
+connection. This is mostly useful for three main situations. One is when
+you want people to see your multimedia MOO creations but not have to connect
+via telnet or learn to use the MOO's text interface. You can just give them
+the URL of the room or object you want them to see in the form:
+http://bioinfo.weizmann.ac.il:8000/99anon/anonview/4715 where "4715" is the
+object number of the room or object. Note that you can obtain a MOO object's
+number by using "examine &lt;object&gt;" and finding it in the list of aliases.
+A URL in the above format will take you directly to the Ghost Viewer, with
+the specified object as its focus.
+<P>
+Another use of the Ghost Viewer is to just peek into the MOO via web when
+you want a quick look at something, but don't want to bother making the extra
+telnet/client connection. If you use the same URL format as given above,
+but leave off the object number, you'll go to the "ghost's home" room in
+the MOO and from there can make your way to where you need to go.
+<P>
+Finally, you can use the Ghost Viewer, when you already have a web window
+open, to get a quick look at some other room in the MOO. Just open a second
+web browser window, and in THAT window go to the Ghost Viewer address. When
+you move your ghost in that window, your character will stay in place. You
+can throw off as many of these astral projections as you wish, and wander
+the MOO with them.
+<P>
+<P>
+<A NAME="Manipulation"><FONT SIZE=+1> Can I manipulate objects through the
+web?</FONT></A>
+<P>
+Although most objects won't be manipulable through the web, some certainly
+are. The most common examples are notes and letters. When you select these,
+you'll see the object's description, and then an additional section marked
+"Actions" with one action available: read. The "read" command is a hyperlink,
+so you can select it and the text of the note will replace the note's description
+in the focus area.
+<P>
+If a programmer has added support for web-awareness to the object, you may
+find far more sophisticated controls in the focus area when you select an
+object. The BioGate system provides facilities for programmers to add hyperlinks
+or even full web forms to their objects. When you select the link or use
+the form, the relevant information gets sent to the object and handled in
+whatever way the programmer has arranged. This can lead to a new set of
+information in the text area, or even cause things to happen in the MOO itself,
+such as making you teleport to a new place.
+<P>
+Future versions of the MOO server are expected to include features making
+it possible to automatically present all object commands via the web window.
+Programmers will still be able to customize the web-aware features of their
+objects, but will not be required to do so to enable users to manipulate
+the objects via the web.
+<P>
+<P>
+<A NAME="Imagesandsound"><FONT SIZE=+1>How do I add images and sounds to
+my own objects?</FONT></A>
+<P>
+A separate document entitled "The Builder's Guide to the BioGate System" is
+available that details how MOO builders can associate multimedia information
+with their objects. Note that only "builders" in the technical sense (MOO
+users whom the administrators have given builder privileges) can use these
+features. Builders can add icons, pictures, sounds or entire HTML documents
+to any of the MOO objects they've created. In addition, some specially programmed
+objects may have additional capabilities depending on their web-aware aspects.
+<P>
+<P>
+<A NAME="Webaware"><FONT SIZE=+1> How can I program objects to be
+web-aware?</FONT></A>
+<P>
+A separate document entitled "The Programmer's Guide to the BioGate System"
+is available, which details the relevant aspects of the BioGate system for
+programmers. This guide enables MOO programmers to add new functionality
+and special web aware features to their objects. In addition, using the web
+allows programmers to make web interfaces for their objects that can greatly
+simplify their set-up or use by combining what would be several separate
+text commands into a single web page.
+<P>
+<P>
+<A NAME="Failconnect"><FONT SIZE=+1>What should I do if I can't seem to connect
+to the web system at all?</FONT></A>
+<P>
+We're still collecting information on the various circumstances when people
+have trouble connecting to the MOO's web system. If you don't find an answer
+in this section, please feel free to post questions to the appropriate
+mail-folder in the MOO, or send a letter to the person or people maintaining
+the BioGate system at the MOO.
+<P>
+Some hints:
+<UL>
+  <LI>
+    Don't put spaces in either your user name or your web password when you set
+    them (either upon connecting or by the @webpass command).
+  <LI>
+    Make sure you have the latest version of the web browser you're using (there's
+    a web page for testing if your browser is the latest release). Although we
+    cannot support every browser, a strong effort has been made to support the
+    most common ones. In addition, the BioGate system is routinely tested with
+    the latest Netscape Navigator and NCSA Mosaic versions for Mac and PC.
+    Non-graphical browsers such as Lynx are not likely to be supported in the
+    near future.
+</UL>
+<P>
+</BODY></HTML>

@@ -1,0 +1,65 @@
+              BIOGATE SYSTEM COMMERCIAL LICENSE ORDER FORM
+              --------------------------------------------
+
+    Name: ______________________________________________________
+
+ Company: ______________________________________________________
+
+   Title: _________________________ Date: ______________________
+
+ Address: ______________________________________________________
+
+    City: _________________________ State/Providence: __________
+
+ZIP Code: ____________________ Country: ________________________
+
+ Phone #: _______________________ FAX #: ______________________
+
+  E-Mail: _______________________
+
+BioGate Package Version: ________
+
+Number of Commercial Licenses ($1,000 U.S. each): _____
+
+Total Payment Enclosed: ___________________
+
+By purchasing this license, you agree to the terms of the BioGate Commercial License. A copy of this license should have been included with the software, but is also available at:
+  ftp://bioinfo.weizmann.ac.il/pub/software/MOOsupport/BioGate/comm_license.txt
+
+The software itself is available in several formats at:
+  ftp://bioinfo.weizmann.ac.il/pub/software/MOOsupport/BioGate/
+
+BioGate Partners will send you a receipt to document that you have purchased a commercial license.  By which method should this receipt be sent? (check one) 
+
+	E-mail	____
+	   Fax	____
+	Postal mail	____
+
+At this time, BioGate Partners can only accept payments by check, which should be drawn in U.S. dollars.
+
+Make the check payable to Eric Mercer, and send it along with this order form to:
+
+	BioGate Partners
+	attn. Eric Mercer
+	484 Avenue Rd. #1106
+	Toronto, ON  M4V 2J4
+	Canada
+
+	E-Mail: mercere@netcom.ca
+	Phone: (416) 929-7920
+	Fax: (416) 929-5793
+
+Or make the check payable to Gustavo Glusman, and send it along with this order form to:
+
+	BioGate Partners
+	attn. Gustavo Glusman
+	Department of Molecular Genetics
+	The Weizmann Institute of Science
+	76100 Rehovot
+	Israel
+
+	E-Mail: gustavo@bioinformatics.weizmann.ac.il
+	Phone: 001 972 8-343098
+	Fax: 001 972 8-692024
+
+
