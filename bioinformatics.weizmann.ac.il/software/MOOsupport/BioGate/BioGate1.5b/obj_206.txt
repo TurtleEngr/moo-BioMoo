@@ -1,0 +1,52 @@
+"Compiled GGS (#206) at Fri Jul 18 21:29:19 1997 IDT";
+"Generic gopher slate";
+
+ 
+@verb GGS:"more_info_for_web" this none this rx BioGate_wizard
+@program GGS:more_info_for_web
+"more_info_for_web( ) -> HTML doc LIST";
+"Returns the hyperlinked HTML doc equivalent to whatever's";
+"currently being displayed on the gopher slate.";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+text = {"<P><B>The gopher-slate's menu displays:</B>", "<UL>"};
+if (this:_textp())
+  text = {@text, "<PRE>", this.desclines, "</PRE>"};
+else
+  for i in [1..length(this.value)]
+    value = $gopher:parse(this.value[i]);
+    line = tostr("<LI><A HREF=\"", this:url_for(i), "\" TARGET=\"accessory_frame\">", tostr(i), ")</A> ", value[4][2..length(value[4])], "<BR>");
+    text = {@text, line};
+  endfor
+endif
+return {@text, "</UL>"};
+"Last modified Fri Aug 16 02:35:05 1996 IDT by EricM (#3264).";
+.
+ 
+@verb GGS:"url_for" this none this rx BioGate_wizard
+@program GGS:url_for
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+which = args[1];
+seconds_left() < 2 || ticks_left() < 4000 ? $command_utils:suspend_if_needed(1) | 0;
+parse = $gopher:parse(this.value[which]);
+sel = parse[4];
+if (sel)
+  subs = match(parse[3], "%(%w*:%)%(.*%)%(:%w*%|%)@%(.*%)");
+  if (!subs)
+    if (sub2 = match(parse[3], "%<%(0/%)%(.*%)"))
+      path = substitute("00/%2", sub2);
+    elseif (sub2 = match(parse[3], "%<%(1/%)%(.*%)"))
+      path = substitute("11/%2", sub2);
+    else
+      path = parse[3];
+    endif
+    url = "gopher://" + parse[1] + ":" + tostr(parse[2]) + "/" + path;
+  else
+    path = substitute("%4", subs);
+    url = "ftp://" + strsub(substitute("%2", subs), substitute("%1", subs), "") + (subs[3][3][1] < subs[3][3][2] ? ":" + substitute("%3", subs) | "") + path;
+  endif
+  return url;
+else
+  return "";
+endif
+"Last modified Fri Aug 16 02:29:11 1996 IDT by EricM (#3264).";
+.

@@ -1,0 +1,95 @@
+"Compiled Programmer Help (#24) at Fri Jul 18 21:30:00 1997 IDT";
+
+@prop $prog_help."web" {"*pass*", "web", "", "Additional topics for programmers:", "web-system      -- details on web system objects", "web-programming -- how to make MOO objects \"web aware\""} r BioGate_owner
+"The following LIST of STR value may be too long to set as one value.  It needs to be added using @set-note-text.";
+@prop $prog_help."web-programming" {} r BioGate_owner
+@set-note-text $prog_help.web-programming
+Web programming is usually performed by modifying objects such that
+they provide special information when people interact with them using
+the $standard_webviewer.  Note that only the $standard_webviewer and
+other viewers that are only for authenticated transactions can
+interact with the object this way (ie. the Web Ghost Viewer,
+$anon_webviewer, cannot).
+
+To make an object "web aware," add custom verbs to it that accept
+information from the $std_webviewer and returns a
+
+The relevent verbs are:
+
+  :html() - returns the object's description or other "what you
+see" text.
+  :do_post() - called when a POST transaction is directed at the
+object
+  :more_info_for_web() - additional information appended to the
+object's "what you see" section
+  :verbs_for_web() - commands and other user-interaction can go here,
+and is the last portion presented
+
+By default, the #1:html verb returns the object's description,
+and the #1:more_info_for_web and #1:verbs_for_web return nothing.  To
+see an example of a :more_info_for_web verb, check out
+$container:more_info_for_web, which presents the list of objects
+inside the container.  An example of :verbs_for_web is on $note,
+where it presents the "read" command.
+
+The :do_post verb is called when an HTTP transaction of type POST is
+pointed at the object.  These transactions have an accompanying web
+form line that encodes information from the HTML form that contained
+the link.  An object can have a single verb with both "html" and
+"do_post" aliases.
+
+When focused on using a web browser, and object's :html or do_post
+verb is called as:
+
+  html/do_post(who OBJ, rest STR, search STR [,line STR])
+
+Where "line" is only supplied if the transaction is a POST.  The
+"who" value is only included for backward compatibility and is not
+defined.  The verb is called with `player' and caller_perms() set to
+the object number the transaction's authentication assigned it to.
+
+The "REST" and "SEARCH" strings are derived from the URL:
+
+  http://moo.du.org/99webpass/code/what/REST?SEARCH
+
+Where "what" is the object number without the "#" and "code" is the
+code for the web application being used ("view" in the case of the
+$std_webviewer).
+
+The "REST" and "SEARCH" portions of the URL can be used to send
+information to the object, including commands.  For instance, if
+"REST" is "open" it might tell the object to open.
+
+To create a link including embeded information, include a line in the
+:html verb like:
+
+code = $web_utils:user_webviewer:get_code();
+line = tostr("<A HREF=\"http://&LOCAL_LINK;/",code,"/",
+        tonum(this),"/open\">Select to open</A>");
+
+which would (if the object is #5555, and the viewer is the
+$std_webviewer), produce the HTML text:
+
+<A HREF="http://&LOCAL_LINK;/view/5555/open">Select to open</A>
+
+When the MOO outputs this, it will convert the &LOCAL_LINK; string to
+a value pointing back to the MOO and including authentication
+information if needed.  When the user selected this link, another
+call to #5555:html would be made, but this time the value of "REST"
+would be "open" and the verb could act appropriately.
+
+If the reference was for a form, it would look like:
+
+<FORM METHOD="POST" ACTION="http://&LOCAL_LINK;/view/5555">
+<INPUT TYPE="TEXT" NAME="example">
+<INPUT TYPE="SUBMIT">
+<FORM>
+
+When the person selects the "submit" button on the form, a call will
+be made to #5555:do_post and the "line" argument will be the encoded
+information the user entered into the text field.  This data could be
+extracted with $web_utils:parse_form.  For example, if the user
+enters "my text" then:
+
+$web_utils:parse_form(line) -> {{"example","my text"}}
+.

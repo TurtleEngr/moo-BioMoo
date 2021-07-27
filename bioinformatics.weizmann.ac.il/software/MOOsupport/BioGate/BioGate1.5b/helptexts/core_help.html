@@ -1,0 +1,1142 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.04 [en] (Win95; I) [Netscape]">
+   <TITLE>Core Utility Help</TITLE>
+</HEAD>
+<BODY>
+
+<H1>
+<HREF NAME="top">Core Utility Help</H1>
+
+<H2>
+<A NAME="$anon_webviewer"></A>$anon_webviewer</H2>
+The WebGhost Viewer (Anonymous Webviewer, $non_webviewer) allows
+<BR>anonymous web transactions to be used to browse the MOO. This web
+<BR>viewer presents the MOO's rooms much like the $standard_webviewer,
+<BR>but doesn't require the transactions be authenticated. It does not
+<BR>allow users to manipulate objects, but only to examine them in ways
+<BR>that don't change any of their characteristics.
+
+<P>The reason for this restriction is related to the source of the name
+<BR>"WebGhost Viewer." When objects in the MOO change in some way, MOO
+<BR>users expect it's because someone in the MOO has changed them or
+<BR>because the object is somehow "active." If objects could be
+<BR>manipulated by anonymous web transactions, it would appear as if the
+<BR>object were being controlled by something outside the self-contained
+<BR>reality that is the MOO. This would damage the integrity of the VR
+<BR>visualization.
+
+<P>Instead, you can consider anonymous web transactions as being
+<BR>initiated by "ghosts," who are able to see into and wander the MOO
+<BR>but not manipulate anything inside. They have no "body" to
+<BR>manipulate with. Note that there is a @web-option that allows MOO
+<BR>users to detect when a web ghost visits the room, and it is possible
+<BR>to implement some forms of "clairvoance" to allow people inside the
+<BR>MOO to communicate to those outside in a near-real time manner. This
+<BR>may be added in future version of the Biogate system.
+
+<P>The $anon_webviewer presents an HTML page similar in format to the
+<BR>$standard_webviewer. However, it carries several verbs that have the
+<BR>same name found on other BioGate System objects used for
+<BR>authenticated transactions. Some, like the web_viewer_buttons verb
+<BR>(corresponding to $player:web_viewer_buttons), are used to build up
+<BR>the final web page. Others perform the equivalent of commands, like
+<BR>interpret_teleport (which performs functions equivalent to the
+<BR>$teleporter system).
+
+<P>There is a $anon_webviewer.ghost_home property that you can set to
+<BR>the room (OBJ) that all web ghosts originate at when they enter the
+<BR>MOO. This is different from $teleporter.central_room and
+<BR>$player_start to allow you to present specialized messages (in the
+<BR>room's description text) for anonymous web visitors.
+
+<P>The $anon_webviewer.max_lag value (NUM) is the maximum lag in
+<BR>seconds, as compared to $lag_meter.samples[$], beyond which the
+<BR>$anon_webviewer refuses to allow anonymous transactions.
+
+<P>&nbsp;Note that the WebGhost Viewer is provided as a useful anonymous
+web
+<BR>viewer but that wizards may make their own child of $webapp and set
+<BR>the $anon_webviewer pointer to it. This allows MOOs to have their
+<BR>own custom anonymous webviewer, with whatever features they wish.
+<H2>
+<A NAME="$frame_manager"></A>$frame_manager</H2>
+The $frame_manager is a web application ($webapp) that performs
+<BR>various functions related to building frames on the user's web page
+<BR>and directing the proper information to each.
+<BR>It ignores the WHAT portion of the information sent by the $http_handler,
+but uses the REST portion to determine what action to perform. The following
+are recognized:
+
+<P>frameset
+
+<P>This is an instruction to create a &lt;FRAMESET> HTML document, defining
+<BR>the frames and the URLs of the pages to be loaded into each. For
+<BR>instance, a two frame page with a web document display above and a
+<BR>java telnet client below might be specified. The
+<BR>$frame_manager:make_frameset verb does the actual work.
+
+<P>javaclient
+
+<P>This command returns the HTML document containing appropriate &lt;EMBED>
+<BR>tags for placing a Java telnet client in the specified frame. The
+<BR>$frame_manager determines which $jclient_handler to use with the
+<BR>$frame_manager:get_jclient_html verb.
+
+<P>preload
+
+<P>This command retrieves the "preload" page to be displayed in the web
+<BR>document frame until the full layout is complete. Completion is
+<BR>generally marked by a call from the Java telnet client to display a
+<BR>new page in the "html_frame" of the display. The preload page is
+<BR>defined by the particular $jclient_handler that is being included on
+<BR>the page in the "interaction_frame" frame. The
+<BR>$frame_manager:preload_page verb creates the text.
+<H2>
+<A NAME="$help_webviewer"></A>$help_webviewer</H2>
+The Help Text WebViewer ($help_webviewer) is a web application that
+<BR>serves help text pages from the MOO's help database system, or from
+<BR>help texts on MOO objects themselves.
+
+<P>The routine form for a URL to retrieve a help text is:
+<BR>&nbsp; http://moo.du.org:8000/help/no_object/topic?mail
+<BR>where in this example the help text for the "mail" topic is returned.
+
+<P>The form for returning the header text for a verb is:
+<BR>&nbsp; http://moo.du.org:8000/help/no_object/topic?$string_utils:space
+<BR>The system can also return texts associated with objects:
+<BR>&nbsp; http://moo.du.org:8000/help/20
+<BR>to return the help text for object #20 (usually $string_utils).
+
+<P>For objects that have their own help databases associated with them,
+<BR>you can obtain the help text for a topic in one of those specialized
+<BR>databases with:
+<BR>&nbsp; http://moo.du.org:8000/help/50/topic?fill
+<BR>where in this case the object is the Verb Editor (#50), and "fill"
+is
+<BR>the topic name.
+
+<P>The Help Text WebViewer also includes a search field, where people
+<BR>can enter the name of a topic to display. At this time, the
+<BR>WebViewer does not do keyword searches, although this functionality
+<BR>could be added.
+<BR>In order to minimize the potential for lagging the MOO through high
+<BR>anonymous access of the WebViewer, the object will only accept at
+<BR>most a certain number of simultaneous anonymous transactions. This
+<BR>is set by $help_webviewer.max_anon_calls property (set to 4 by
+<BR>default). Note that if an anonymous transaction is interrupted due
+<BR>to a traceback error, that call's record will not be cleared, and as
+<BR>a result the object will not know that it isn't still processing that
+<BR>transaction. As a result, the $help_webviewer.current_anon_calls
+<BR>property will no go back down to zero. Should several of these
+<BR>events occur, the Help Text Webviewer may refuse any new anonymous
+<BR>transcations, even though it isn't really processing any currently.
+<BR>To fix this, just "@set $help_webviewer.current_anon_calls to 0" to
+<BR>reset the value.
+<H2>
+<A NAME="$html_editor"></A>$html_editor</H2>
+&nbsp;The $html_editor is a child of the generic editor that specifically
+<BR>writes to object's associated URL/HTML data(#1.url). Instead of
+<BR>having "string" and "list" modes, like the text editor, it has a
+<BR>"URL" and an "HTML" mode. The URL mode writes a single string,
+<BR>indicative of a URL, and the HTML mode writes a list of strings,
+<BR>indicative of an HTML text.
+
+<P>Although it doesn't yet have any HTML-specific commands, these may be
+<BR>added in the future to facilitate its use in creating HTML texts.
+<BR>However, you can always create the HTML text in your favorite editor,
+<BR>then paste the part between the &lt;BODY and &lt;/BODY> tags into the
+HTML
+<BR>editor to attach that HTML text to an object.
+<H2>
+<A NAME="$http_handler"></A>$http_handler</H2>
+The $http_handler:handle_http10 is the primary mechanism for
+<BR>processing web transactions, and is usually called by an $http_port.
+<BR>It accepts a URI in the following forms, with the results given:
+
+<P>1) http://HOSTNAME:PORT
+<BR>2) http://HOSTNAME:PORT/?WEBPASS
+<BR>3) http://HOSTNAME:PORT/xxWEBPASS
+<BR>4) http://HOSTNAME:PORT/xxWEBPASS/CODE
+<BR>5) http://HOSTNAME:PORT/xxWEBPASS/CODE/OBJECT
+<BR>6) http://HOSTNAME:PORT/xxWEBPASS/CODE/OBJECT/REST
+<BR>7) http://HOSTNAME:PORT/xxWEBPASS/CODE/OBJECT/REST?SEARCH
+
+<P>Where HOSTNAME is currently bioinfo.weizmann.ac.il,
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PORT is 8888,
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xx are two random characters,
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WEBPASS is the user's web password and
+may be blank,
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CODE is the web application's identity,
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OBJECT is an object number (without
+the #),
+<BR>&nbsp; and REST is anything else you append to the URL.
+
+<P>When the MOO receives a web connection, it parses it as described
+<BR>above, and does the following:
+
+<P>- a URL of type 1) will simply show the MOO's gateway page, unless
+<BR>&nbsp;&nbsp; there is a form attached (which is then evaluated for
+<BR>&nbsp;&nbsp; authentication information).
+<BR>- a URL of type 2) or 3) will check the webpass.
+<BR>&nbsp; - if it's omitted then either web cookie or web "domain"
+<BR>&nbsp;&nbsp;&nbsp; authentication is used.
+<BR>&nbsp; - if it's bad, it will show the MOO's identification screen.
+<BR>&nbsp; - if it's OK, it will show the list of web applications.
+<BR>- a URL of types 4), 5), 6) or 7) will check the CODE.
+<BR>&nbsp; - if there isn't a code of a valid web app, it will show the
+list
+<BR>&nbsp;&nbsp;&nbsp; of apps.
+<BR>&nbsp; - if it's a valid code, it will call the application's :method_get
+<BR>&nbsp;&nbsp;&nbsp; or :method_post giving it as parameters: (who, what,
+rest,
+<BR>&nbsp;&nbsp;&nbsp; search), which are: the user whose webpass is being
+used,
+<BR>&nbsp;&nbsp;&nbsp; the object number that was parsed, the REST, and
+the SEARCH
+<BR>&nbsp;&nbsp;&nbsp; if any.
+<BR>_____________________________
+
+<P>Web transactions typically follow the pathway:
+
+<P>$http_port
+<BR>&nbsp;&nbsp; |
+<BR>&nbsp;&nbsp; V
+<BR>/$http_handler:handle_http10
+<BR>\$http_handler:handle_http09
+<BR>&nbsp;&nbsp; |
+<BR>&nbsp;&nbsp; | &lt;-> parse_line
+<BR>&nbsp;&nbsp; |
+<BR>&nbsp;&nbsp; | &lt;-> /web_authenticate
+<BR>&nbsp;&nbsp; | \cookie_authenticate
+<BR>&nbsp;&nbsp; |
+<BR>&nbsp;&nbsp; | &lt;-> init_taskprop
+<BR>&nbsp;&nbsp; V
+<BR>:process &lt;-> /$webapp:method_get &lt;-> /object:html
+<BR>&nbsp;&nbsp; | \$webapp:method_post | object:do_post
+<BR>&nbsp;&nbsp; | \object:get_vrml
+<BR>&nbsp;&nbsp; |
+<BR>&nbsp;&nbsp; | The `process' verb determines which $webapp to call
+and
+<BR>&nbsp;&nbsp; | processes the result into its final form.
+<BR>&nbsp;&nbsp; |
+<BR>make_headerlist
+<BR>&nbsp;&nbsp; |
+<BR>&nbsp;&nbsp; V
+<BR>tell_quick_and_die
+<BR>_____________________________
+
+<P>These properties are defined on $http_handler
+
+<P>task_details
+<BR>task_index
+<BR>&nbsp;&nbsp;&nbsp; These store information about the open web transactions
+<BR>&nbsp;&nbsp;&nbsp; that can be retrieved with $http_handler;retrieve_taskprop.
+<BR>&nbsp;&nbsp;&nbsp; Also, any verb called during the transaction can
+submit new
+<BR>&nbsp;&nbsp;&nbsp; task properties that can then be retrieved by any
+other
+<BR>&nbsp;&nbsp;&nbsp; verb when called. Some default properties can only
+be
+<BR>&nbsp;&nbsp;&nbsp; retreived by wizardly verbs.
+<BR>total_webcalls
+<BR>&nbsp;&nbsp;&nbsp; Total number of web transactions handled by this
+object
+<BR>&nbsp;&nbsp;&nbsp; since its installation.
+<BR>webpass_handler
+<BR>&nbsp;&nbsp;&nbsp; The object number of the webpass handler object.
+The
+<BR>&nbsp;&nbsp;&nbsp; webpass handler is not corified.
+<BR>gateway_html
+<BR>&nbsp;&nbsp;&nbsp; The default web page displayed when someone connects
+to
+<BR>&nbsp;&nbsp;&nbsp; $network.site on a port with an $http_port object
+<BR>&nbsp;&nbsp;&nbsp; listening. This should have a form allowing authentication
+<BR>&nbsp;&nbsp;&nbsp; (see the default value for an example).
+<BR>wizwebpass_disallowed
+<BR>&nbsp;&nbsp;&nbsp; Almost obsoleted mechanism for regulating which
+<BR>&nbsp;&nbsp;&nbsp; authentication system wizards may use to open a
+web window
+<BR>&nbsp;&nbsp;&nbsp; for their wiz character.
+<BR>version
+<BR>&nbsp;&nbsp;&nbsp; The currently installed version of the BioGate system.
+<BR>output_timeout
+<BR>&nbsp;&nbsp;&nbsp; If a transaction takes longer than this number of
+seconds,
+<BR>&nbsp;&nbsp;&nbsp; it is assumed to have failed (probably due to a
+traceback),
+<BR>&nbsp;&nbsp;&nbsp; and the connection is broken.
+<BR>password_failed_text
+<BR>&nbsp;&nbsp;&nbsp; Text returned if a web transaction is incorrectly
+<BR>&nbsp;&nbsp;&nbsp; authenitcated.
+<BR>exempt_from_pads
+<BR>&nbsp;&nbsp;&nbsp; By default, the $http_handler assumes transactions
+are
+<BR>&nbsp;&nbsp;&nbsp; requests for HTML documents, and builds a proper
+header and
+<BR>&nbsp;&nbsp;&nbsp; footer with the appropriate tags. Some transactions,
+like
+<BR>&nbsp;&nbsp;&nbsp; VRML requests, shouldn't have these and are "exempted
+from
+<BR>&nbsp;&nbsp;&nbsp; pads." Although the $std_vrml10viewer and $frame_manager
+<BR>&nbsp;&nbsp;&nbsp; are automatically exempt, any other kids of the
+$webapp you
+<BR>&nbsp;&nbsp;&nbsp; want exempted should be added here.
+<BR>anon_access_limits
+<BR>&nbsp;&nbsp;&nbsp; A list of two elements, that set usage limits beyond
+which
+<BR>&nbsp;&nbsp;&nbsp; unauthenticated transactions are rejected. The first
+<BR>&nbsp;&nbsp;&nbsp; element is the maxiumum number of concurrent web
+<BR>&nbsp;&nbsp;&nbsp; transactions and the second is the maximum MOO lag
+in
+<BR>&nbsp;&nbsp;&nbsp; seconds.
+<BR>lag_meter
+<BR>&nbsp;&nbsp;&nbsp; Object that tracks and reports lag. Found in most
+MOOs
+<BR>&nbsp;&nbsp;&nbsp; though not part of LambdaCore. If not set, lag-based
+<BR>&nbsp;&nbsp;&nbsp; features are disabled.
+<BR>too_much_load_text
+<BR>&nbsp;&nbsp;&nbsp; HTML doc sent when the MOO has too high a load to
+process
+<BR>&nbsp;&nbsp;&nbsp; unauthenticated HTTP transactions.
+<BR>java_clients
+<BR>&nbsp;&nbsp;&nbsp; List of Java telnet client handlers allowed to use
+the web
+<BR>&nbsp;&nbsp;&nbsp; system.
+<BR>javaclient_codebase
+<BR>&nbsp;&nbsp;&nbsp; The subdirectory at the MOO's site where java clients
+are
+<BR>&nbsp;&nbsp;&nbsp; found. Used as $network.site +
+<BR>&nbsp;&nbsp;&nbsp; $http_handler.javaclient_codebase +
+<BR>&nbsp;&nbsp;&nbsp; $jclient_handler.client_name
+<BR>login_is_http09
+<BR>&nbsp;&nbsp;&nbsp; If true, treats call transactions that come through
+$login
+<BR>&nbsp;&nbsp;&nbsp; as HTTP/0.9 (rarely used).
+<BR>port_handlers
+<BR>&nbsp;&nbsp;&nbsp; List of objects permitted to call the handle_http09
+and
+<BR>&nbsp;&nbsp;&nbsp; handle_http10 verbs. Generally kids of $http_port,
+and
+<BR>&nbsp;&nbsp;&nbsp; sometimes $login.
+<BR>auth_ports
+<BR>&nbsp;&nbsp;&nbsp; Almost obsoleted mechanism for regulating which
+<BR>&nbsp;&nbsp;&nbsp; authentication system wizards may use to open a
+web window
+<BR>&nbsp;&nbsp;&nbsp; for their wiz character.
+<BR>robots_txt
+<BR>&nbsp;&nbsp;&nbsp; Sent upon requests for "/robots.txt" and tells web
+spiders
+<BR>&nbsp;&nbsp;&nbsp; not to scan the MOO for web pages (which could cause
+CPU and
+<BR>&nbsp;&nbsp;&nbsp; networking load problems). Note that you can use
+this to
+<BR>&nbsp;&nbsp;&nbsp; restrict web spiders and other web cataloging robots
+to only
+<BR>&nbsp;&nbsp;&nbsp; portions of your MOO. By default, everything but
+the gateway
+<BR>&nbsp;&nbsp;&nbsp; page is off limits. For details on constructing
+a robots.txt
+<BR>&nbsp;&nbsp;&nbsp; entry, see:
+<BR>&nbsp;&nbsp;&nbsp; http://info.webcrawler.com/mak/projects/robots/robots.html
+<H2>
+<A NAME="$http_port"></A>$http_port</H2>
+&nbsp; The $http_port listens on a MOO port for incoming HTTP transactions
+<BR>has a few properties and verbs that provide its listening
+<BR>functionality, and it also carries some properties used by the server
+<BR>that are described in detail in the LambdaMOO Programmer's Manual
+<BR>(server_options, connect_timeout, timeout_msg, recycle_msg, boot_msg,
+<BR>redirect_from_msg, redirect_to_msg, create_msg, connect_msg, and
+<BR>server_full_msg).
+
+<P>The $http_port:do_login_command verb is the main workhorse of the
+<BR>object. It parses the incoming transaction's first line to
+<BR>determine the method (GET/POST), the URI (specifies the requested
+<BR>resource), and the protocol version (generally 1.0). Transactions
+<BR>are then passed to $http_handler:handle_http09 or
+<BR>$http_handler:handle_http10 depending on the HTTP version of the
+<BR>incoming transaction.
+
+<P>User commands (wizardly use only) on the $http_port are:
+
+<P>@set-port &lt;port number> on &lt;listener>
+<BR>&nbsp;&nbsp; set the port to listen on
+<BR>@startlistening on &lt;listener>
+<BR>&nbsp;&nbsp; the object starts listening
+<BR>@stoplistening on &lt;listener>
+<BR>&nbsp;&nbsp; the object stops listening
+
+<P>These have executable equivalents, useful if your MOO automatically
+<BR>starts listening with an $http_port upon startup. These
+<BR>are: set_port, listen, and unlisten.
+<H2>
+<A NAME="$jclient_handler"></A>$jclient_handler</H2>
+Child objects of the $jclient_handler carry verbs and properties that
+<BR>allow the MOO to effectively communicate with their corresponding
+<BR>java telnet applets. This includes information like where the applet
+<BR>may be retrieved from, and how to tell the applet to update a web
+
+<P>Verbs on the $jclient_handler work with the Cup-O MUD client by
+<BR>default, but can be overridden on child objects to give new
+<BR>functionality.
+<BR>page.
+
+<P>The "client_name" property must be set for the client handler to
+<BR>function. This is actually the subdirectory and class file name to
+<BR>be appended to $http_handler.java_clients when forming the URL for
+<BR>retrieving the Java code.
+
+<P>For instance:
+<BR>&nbsp; $network.site = moo.site.org
+<BR>&nbsp; $http_port.handles_port = 8000
+<BR>&nbsp; $http_handler.java_clients = "/java/"
+<BR>&nbsp; &lt;jclient_handler>.client_name = "CupOmud/CupOmud"
+
+<P>Would yield the URL:
+<BR>&nbsp; http://moo.site.org:8000/java/CupOmud/CupOmud.class
+
+<P>The "default_preload_page" property contains the text to be displayed
+<BR>in the web page frame of the user's web browser window until the
+<BR>telnet client finishes loading and issues a "display URL" command of
+<BR>its own. You can use the default value if you wish.
+
+<P>The "client_windowname" and "html_windowname" properties give the
+<BR>names of the frames that will hold the client applet and the HTML
+<BR>text display, respectively.
+
+<P>The "float_client_frame" verb returns true if the client will be set
+<BR>in a floating independent frame. Typically it just returns the value
+<BR>of the "float_client_frame" property, but may also check user
+<BR>preferences to determine a result.
+
+<P>The "make_applet_html" verb is called by the $frame_manager and
+<BR>returns the HTML document containing &lt;EMBED> tags that will load
+the
+<BR>Java telnet client.
+
+<P>The "update_webframe" verb sends a command (using MCP in the case of
+<BR>Cup-O MUD) to the the client that causes it to force the web browser
+<BR>to load a new HTML document into a specified frame.
+
+<P>The "user_autoconnected" verb is called when a person first connects
+<BR>to the MOO through a Java telnet client, typically through the
+<BR>$login:preapproved system.
+
+<P>The "preload_page" verb returns the HTML document to be displayed in
+<BR>the usual web page frame until the first "display URL" command is
+<BR>issued by the Java telnet client.
+<H2>
+<A NAME="$mail_browser"></A>$mail_browser</H2>
+&nbsp; The $mail_browser is a web system tool for reading MOO mail
+<BR>folders.It has two customizable properties on it:
+
+<P>&nbsp;&nbsp; The "headerlist_len" property is the length of the headers
+list
+<BR>&nbsp;displayed when someone browses a folder.
+
+<P>&nbsp;&nbsp; The "guest_subscribed_folders" is the list of mail folders
+(as a
+<BR>&nbsp;LIST of OBJ numbers) that guest and anonymous web users are shown
+as
+<BR>&nbsp;their "subscribed" folders. They can access the others (that
+are
+<BR>&nbsp;public) through the "list all folders" link, but this is basically
+<H2>
+<A NAME="$standard_webviewer"></A>$standard_webviewer</H2>
+&nbsp; The $standard_webviewer is provided to serve as a major interface
+<BR>for people using the web interface to access the MOO's multimedia
+<BR>information. Other such interfaces may be created and used, and even
+<BR>set to be the standard webviewer themselves, but the BioGate System
+<BR>comes with this viewer that you can use immediately. Note that users
+<BR>can select a different default web viewer application to be used with
+<BR>their character the "viewer" @weboption.
+<BR>&nbsp; The $standard_webviewer is different from the $anon_webviewer
+in
+<BR>that the latter may be used by people without any telnet connection
+<BR>into the MOO, who are essentially browsing anonymously. The
+<BR>$standard_webviewer may only be used by people connected by telnet
+to
+<BR>a MOO character. The reason is that the MOO is a self-contained
+<BR>world, and people using it expect changes in the world to be due to
+<BR>people or automatec processes within that world. Therefore,
+<BR>unattributed transactions like those from the web without a matching
+<BR>telnet connection, are restricted. People without registered
+<BR>characters can use the $standard_webviewer by connecting to a guest
+<BR>character, thereby giving themselves a "presence" within the VR
+<BR>world. The $standard_webviewer extends the simple browsing with the
+<BR>ability to move the user's MOO character, communicate with others,
+<BR>and manipulate MOO objects, all through the web interface.
+
+<P>&nbsp; The $standard_webviewer is called by $http_handler:process through
+<BR>the usual indentification of the ".code" property, which is "viewer"
+<BR>by default. The :method_get (or :method_post) verb is called with
+<BR>args {who, what OBJ, rest STR, search STR, form STR}, where "what"
+is
+<BR>the object to be viewed. If no object is specified, the user's
+<BR>location (player.location) is assumed. Note that authentication is
+<BR>performed earlier by the $http_handler, which sets the "player" value
+<BR>before the call. The :method_get verb builds the various portions of
+<BR>the final web page, then combines them and returns the text and a
+<BR>title for the web window ({title STR, text LIST}).
+<BR>&nbsp; The :method_post verb is only called when the user selects an
+item
+<BR>on the optional "command form" that may be included in the basic web
+<BR>page by the "commandform" web option, if the user chooses.
+
+<P>&nbsp; The components of the web page are assembled as follows:
+<BR>1. If there are option toggles, indicated by flanking "+" symbols in
+<BR>&nbsp;&nbsp; the "rest" portion, these are used to set user display
+options.
+<BR>2. The "focus" object's HTML text is retrieved by a call to
+<BR>&nbsp;&nbsp; what:html(rest, search, line). If the value returned is
+a list
+<BR>&nbsp;&nbsp; of STRings, it is assumed to be an HTML text fragment.
+If it is
+<BR>&nbsp;&nbsp; in the form {where OBJ, what OBJ} then it is a redirection
+to a
+<BR>&nbsp;&nbsp; new "what" with a new base location (replacing
+<BR>&nbsp;&nbsp; "player.location"), and the new what:html() is called
+without
+<BR>&nbsp;&nbsp; additional arguments. The inability to redirect the
+<BR>&nbsp;&nbsp; rest/search/form arguments is for security purposes. A
+maximum
+<BR>&nbsp;&nbsp; of four redirections is permitted. If what:html() returns
+the
+<BR>&nbsp;&nbsp; value $nothing, then "what" and "where" are set to
+<BR>&nbsp;&nbsp; "player.location" and a fresh call (without args) to what:html()
+<BR>&nbsp;&nbsp; is performed.
+<BR>3. The attributes to be inserted into the page's &lt;BODY> tag are
+<BR>&nbsp;&nbsp; retrieved from web setting named "bodytag_attributes"
+if one is set
+<BR>&nbsp;&nbsp; [what:get_web_setting()]. Also, the "hide_banner" web
+setting is
+<BR>&nbsp;&nbsp; checked for.
+<BR>4. The "button bar" is generated by a call to
+<BR>&nbsp;&nbsp; player:web_viewer_buttons(viewer.code STR, what OBJ).
+<BR>5. A map is inserted if the "map" web option has been set, which is
+<BR>&nbsp;&nbsp; generated by $teleporter:html(who, 0, 0).
+<BR>6. The "You are at" and "examining...&lt;what>" lines are generated
+as
+<BR>&nbsp;&nbsp; links to the $object_browser view of the given objects.
+<BR>7. The list of exits is generated by
+<BR>&nbsp;&nbsp; $standard_webviewer:generate_exitlist(where).
+<BR>8. A list of carried object is included if the "inv" web option is
+<BR>&nbsp;&nbsp; set, generated by $web_utils:list_english_list_with_urls(player
+OBJ,
+<BR>&nbsp;&nbsp; viewer.code STR, objects LIST).
+<BR>9. The "command form" is generated if the "commandform" web option
+is
+<BR>&nbsp;&nbsp; set, and generated by $standard_webviewer:command_form().
+<BR>10. An &lt;EMBED> portion for the VRML view is included if the
+<BR>&nbsp;&nbsp; "embedVRML" web option is set, generated by
+<BR>&nbsp;&nbsp; $standard_webviewer:embedVRML(what).
+<BR>11. Finally, the fragments are assembled in the appropriate order and
+<BR>&nbsp;&nbsp; the complete web page body is returned to the $http_handler.
+<H2>
+<A NAME="$std_vrml10viewer"></A>$std_vrml10viewer</H2>
+The $std_vrml10viewer is a webapp that displays a static VRML/1.0
+<BR>view of a given room. Although it will pass VRML/2.0 information, it
+<BR>doesn't have any facilities for live VRML display control. It does
+<BR>dynamically create the room view, though, so the returned VRML file
+<BR>describes the room at the moment of the request.
+
+<P>It is usually invoked with a URL in the form:
+
+<P>&nbsp; http://moo.site.org:8000/99anon/vrml10/5555/room.wrl
+
+<P>Where "anon" specifies an unauthenticated transaction, "5555" is the
+<BR>room or other object whose VRML description will be returned, and
+<BR>"room.wrl" is appended for web browsers that use the file extension
+<BR>instead of the MIME information in the HTTP header to determine
+<BR>processing. All HTP/1.0 transactions processed by the
+<BR>$std_vrml10viewer are of "x-world/x-vrml" MIME type.
+
+<P>The transactions follow the general form:
+
+<P>$http_handler
+<BR>&nbsp;&nbsp; A
+<BR>&nbsp;&nbsp; |
+<BR>&nbsp;&nbsp; V
+<BR>$std_vrml10viewer:method_get
+<BR>&nbsp;&nbsp; A
+<BR>&nbsp;&nbsp; |
+<BR>&nbsp;&nbsp; V
+<BR>&lt;room>:get_vrml &lt;-> .vrml_interior_desc
+<BR>&nbsp;&nbsp; A
+<BR>&nbsp;&nbsp; | The room retrieves the VRML file fragment for each
+<BR>&nbsp;&nbsp; | object inside, and adds cameras for each child
+<BR>&nbsp;&nbsp; | of $player. It also adds a standard "to web page" link
+<BR>&nbsp;&nbsp; | and a "to outside room" link of the room is "interior."
+<BR>&nbsp;&nbsp; |
+<BR>&nbsp;&nbsp; V
+<BR>&lt;objects>:get_vrml() &lt;-> :get_vrml_desc
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+:get_vrml_translation
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+:get_vrml_rotation
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+:get_vrml_scale
+
+<P>Key data is stored on #1.vrml_desc, #1.vrml_coords, and
+<BR>#1.vrml_settings. The first is a list of strings, comprising the
+<BR>VRML file fragment describing the object's structure. The vrml_settings
+contains various VRML-related settings that are specific to the room. See
+the help text for "@set-vrml" to see which are currently defined for all
+rooms.
+
+<P>The vrml_coords property has the form:
+<BR>&nbsp;&nbsp;&nbsp; { {NUM, NUM, NUM}, {NUM, NUM, NUM}, {NUM, NUM, NUM}
+}
+<BR>Where the first triplet is the XYZ translations from the room's
+<BR>origin in milliunits, the second set is the XYZ rotations from the
+<BR>origin in millirads, and the third set is the XYZ scaling in
+<BR>milliunits. This allows a minimum translation of 1 milliunit and a
+<BR>maximum of2147483. In most cases, a VRML unit is perceived as about
+<BR>.75 meters, giving a translation range between .75 mm and 1612 km.
+<H2>
+<A NAME="$teleporter"></A>$teleporter</H2>
+The General Teleporter ($teleporter) is a set of utilities for
+<BR>teleporting users that consolidates all message display and other
+<BR>functions. It is used by the BioGate System for teleporting users who
+<BR>jump using the MOO's web system.
+
+<P>The main verbs on the $teleporter are:
+
+<P>$teleporter:teleport_user(who OBJ, where OBJ [, @ optional messages])
+
+<P>This is the non-web utility for moving characters, and performs all
+<BR>appropriate testing of if the character was successfully moved and
+<BR>presenting appropriate messages to their former and subsequent
+<BR>location. If no optional messages are given, then those on the
+<BR>character or the $teleporter are used as needed. See the help for
+<BR>$teleporter:teleport_user for details of the optional messages.
+
+<P>$teleporter:move_user_for_web(who OBJ, where OBJ)
+
+<P>This verb performs user character movement for the web system,
+<BR>including the VRML system. It is not generally used by other
+<BR>systems, which should use $teleporter:teleport_user instead.
+
+<P>There are several properties on the $teleporter, some of which are
+<BR>important for the web system.
+
+<P>.image_map - A STR with the URL of the MOO's default image map,
+<BR>presented as part of the Web Viewer page if no room enclosing the
+<BR>character has its own image_map property.
+
+<P>.imagemap_regions - A LIST in the form used by
+<BR>$web_utils:interpret_map that divides the graphic given by the
+<BR>image_map property into selectable regions.
+
+<P>.imagemap_rooms - A LIST of OBJ's, with each object a room
+<BR>corresponding to the indexed region in the imagemap_regions property
+<BR>(ie. the first room given is the place to move users who select the
+<BR>first region specified in imagemap_regions).
+
+<P>.central_room - An OBJ specifying where the "center" of the MOO is.
+<BR>This is used by some Web Viewers to present a button that returns
+<BR>people to the MOO's center. Set to #11 by default, and generally
+<BR>equal to $player_start.
+
+<P>default_mapsize - A LIST in the form {NUM, NUM} cotaining the
+<BR>{length, width} in pixels of the image specified by the "image_map"
+<BR>property. Some web viewers will force all image maps to this size,
+<BR>which helps keep the display consistant. Note that if your map does
+<BR>not conform to this size, the regions in the imagemap_regions may not
+<BR>be correctly selected.
+<H2>
+<A NAME="$webapp"></A>$webapp</H2>
+Web applications (child objects of $webapp) generate the text that is
+<BR>returned as a result of an HTTP transaction. For instance, the
+<BR>webapp that creates the standard web page view of MOO rooms is the
+<BR>$standard_webviewer, and the one that generates the VRML description
+<BR>of rooms is the $std_vrml10viewer. Other webapps perform tasks such
+<BR>as user character customization, browsing and setting the
+<BR>characteristics of objects, or reading the MOO's mail folders. By
+<BR>interposing webapps between the $http_handler and the general MOO
+<BR>objects, functions are encapsulated in a way that 1. allows security
+<BR>restrictions for broad functional catagories, 2. segregates the web
+<BR>system into distinct parts, making debugging and extension of the
+<BR>system easier.
+
+<P>The webapp to use in a transaction is specified by the CODE portion
+<BR>of the URL, given the general format:
+<BR>&nbsp; http://HOSTNAME:PORT/xxWEBPASS/CODE/OBJECT/REST?SEARCH
+<BR>The $http_handler:process verb determines which webapp is targeted
+by
+<BR>checking the "code" property of each child of $webapp, and matching
+<BR>the values. Note that if you want to restrict valid webapps to only
+<BR>first generation decendents of $webapp, you should modify the
+<BR>appropriate lines in $http_handler:process and
+<BR>$http_handler:provide_menu so that the list of valid webapps is
+<BR>children($webapp) instead of $object_utils:descendents($webapp).
+
+<P>Once the appropriate webapp has been identified, a call is made to
+<BR>either its "method_get" or "method_post" verb, depending ont he type
+<BR>of the transaction. Webapps may have a single verb with both names
+<BR>as aliases. The call has the form:
+
+<P>method_get(who, what, rest, search)
+<BR>method_post(who, what, rest, search, line)
+
+<P>where:
+<BR>&nbsp; who - originally set to `player' and now no longer used but
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; retained
+for backward compatability.
+<BR>&nbsp; what - the object specified as OBJECT in the URI, or #0 if the
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; object
+is not valid.
+<BR>&nbsp; rest - The REST portion of the URI.
+<BR>&nbsp; search - The SEARCH portion of the URI.
+<BR>&nbsp; line - The unparsed form line of a method POST transaction,
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; generally
+processed by the webapp with
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $web_utils:parse_form.
+
+<P>The webapp is expected to use this information to create the text
+<BR>that is the result of the HTTP transaction. By default, the webapp
+<BR>is expected to return the &lt;BODY> portion of the text for an HTML
+<BR>document, and the $http_handler:process verb adds the &lt;HEAD> and
+<BR>other information. However, webapps listed in
+<BR>$http_handler.exempt_from_pads are not treated this way, and the text
+<BR>they return is directly sent to the transaction port.
+
+<P>Webapps that return HTML document text should do so in the form:
+<BR>&nbsp; { "&lt;title>", {&lt;lines of text>} }
+<BR>Where &lt;lines of text> are the strings composing the HTML text, and
+<BR>&lt;title> is the title that will head the web browser's window. See
+<BR>the help for "$web_utils:format_webapp_result_to_html" for details
+of
+<BR>the formats $http_handler:process will accept results in from a
+<BR>webapp.
+<H2>
+<A NAME="biogate-setup"></A>biogate-setup</H2>
+INITIALIZING AND CUSTOMIZING THE BIOGATE SYSTEM
+
+<P>This text describes what properties need to be initialized after you
+<BR>have installed the BioGate System in your MOO. It provides a list of
+some
+<BR>items you can customize. A more detailed description of nearly every
+<BR>property in the BioGate System can be found in the help texts
+<BR>installed in $core_help for each of the BioGate System objects. The
+<BR>properties listed here are only the one's that must be customized for
+<BR>the system to function properly, and for which setup instructions are
+<BR>not given elsewhere in the installation package instructions.
+
+<P>On $http_handler
+<BR>----------------
+<BR>lag_meter
+<BR>&nbsp; Object number of a lag meter object, with a .samples property
+<BR>&nbsp; listing recent lag values. This object is common in MOOs, but
+if
+<BR>&nbsp; you don't have one, this property can just be set to a #-1 value.
+
+<P>gateway_html
+<BR>&nbsp; A text displayed as the MOO's web gateway page if there is no
+FUP
+<BR>&nbsp; system installed or no web/gateway.html file accessible. See
+the
+<BR>&nbsp; text of the sample gateway.html file for embedded comments
+<BR>&nbsp; describing the contents of that page.
+
+<P>webpass_handler
+<BR>&nbsp; The object number of the Webpass Handler object installed with
+the
+<BR>&nbsp; BioGate System.
+
+<P>On $web_utils
+<BR>-------------
+<BR>page_banner
+<BR>&nbsp; A fragment of HTML used to insert a "banner" across the top
+of each
+<BR>&nbsp; web page the MOO generates. This is NOT just a URL, but is a
+<BR>&nbsp; compelte &lt;IMG> tag. The reason is that instead of just an
+image,
+<BR>&nbsp; you may want to use an imagemap or something more complex as
+the
+<BR>&nbsp; banner. The entire value for this property is inserted into
+the
+<BR>&nbsp; web page whole.
+
+<P>interior_rooms
+<BR>&nbsp; A list of object numbers for rooms that are "interior" or
+<BR>&nbsp; "portable" (in the usual MOO lingo). These are rooms with a
+verb
+<BR>&nbsp; having the name or alias "exit" for which that command can be
+used
+<BR>&nbsp; to exit the room into the enclosing room. By knowing which rooms
+<BR>&nbsp; have this feature, the Biogate System knows to add an "exit"
+link
+<BR>&nbsp; to the list of exists displayed, even though the exit named
+"exit"
+<BR>&nbsp; isn't generally displayed by the usual MOO $room exits listing.
+
+<P>web_helppage
+<BR>&nbsp; The URL for a "help page" for this MOO, which usually should
+have
+<BR>&nbsp; instructions for new MOO users.
+
+<P>MOO_home_page
+<BR>&nbsp; The URL of the MOO's "home page," which can be different from
+its
+<BR>&nbsp; web gateway page or identical.
+
+<P>uparrow_icon
+<BR>&nbsp; The URL for an icon embedded on web pages to indicate "go to
+the
+<BR>&nbsp; top of the page." Available to help promote a common look among
+<BR>&nbsp; MOO-generated web pages, but ignored if this value is set to
+an
+<BR>&nbsp; empty string.
+
+<P>std_bgcolor
+<BR>std_textcolor
+<BR>std_linkcolor
+<BR>std_vlinkcolor
+<BR>std_alinkcolor
+<BR>std_bkgnd
+<BR>&nbsp; These are strings giving various default web page display values,
+<BR>&nbsp; that can help you establish a basaic "look" for web pages the
+MOO
+<BR>&nbsp; generates. However, they can be overridden by various means,
+and
+<BR>&nbsp; really just serve to promote a basic appearance. The only one
+most
+<BR>&nbsp; people will want to set is the .std._bkgnd property, which should
+<BR>&nbsp; be the URL for an image to be used as the standard background
+for
+<BR>&nbsp; all MOO-generated web pages that don't override the default.
+
+<P>wizards_choice
+<BR>&nbsp; Object number of a "Wizard's Choice" object, whose :html verb
+<BR>&nbsp; generates a page pointing out some of the more interesting sites
+to
+<BR>&nbsp; visit in the MOO. Used by the $anon_webviewer and
+<BR>&nbsp; $standard_webviewer to generate their button bar. If set to
+#-1,
+<BR>&nbsp; then no "Wizard's Choice" link is included in the button bar.
+
+<P>On $teleporter
+<BR>--------------
+<BR>image_map
+<BR>&nbsp; The URL for an image to be used as a map of the MOO, and added
+to
+<BR>&nbsp; the bottom of pages generated by the $standard_webviewer and
+<BR>&nbsp; $anon_webviewer. Other properties on $teleporter give further
+<BR>&nbsp; information concerning this imagemap.
+
+<P>central_room
+<BR>&nbsp; The "center" of the MOO. May be $player_start or some other
+room.
+<BR>&nbsp; Used by the $teleporter with certain web objects that send the
+user
+<BR>&nbsp; to the "central room" if one has been designated.
+
+<P>default_mapsize
+<BR>&nbsp; The size to display the MOO imagemap at.
+
+<P>imagemap_regions
+<BR>&nbsp; An ordered list of imagemap regions in $web_utils:interpret_map
+<BR>&nbsp; format. Indexed to the .imagemap_rooms property, so that each
+<BR>&nbsp; region corresponds to a room.
+
+<P>imagemap_rooms
+<BR>&nbsp; A list of rooms to teleport the user to when they select different
+<BR>&nbsp; regions of the imagemap. Those regions, indexed to this list
+of
+<BR>&nbsp; rooms, are specified in the .imagemap_regions property.
+
+<P>On $anon_webviewer
+<BR>------------------
+<BR>ghost_home
+<BR>&nbsp; The object number of the room where people using the WebGhost
+<BR>&nbsp; Viewer start. By default, it's the same as $player_start.
+<H2>
+<A NAME="biogate-system"></A>biogate-system</H2>
+&nbsp; This MOO has installed the Biogate System, a set of MOO objects
+and
+<BR>associated code that allow a MOO to function and a web server, and
+to
+<BR>dynamically create HTML and VRML descriptions of MOO rooms and other
+<BR>objects.
+<BR>&nbsp;The version installed is: 1.3b
+
+<P>The general flow during a web transaction is:
+
+<P>&nbsp;&nbsp;&nbsp; port-handler -> $http_handler &lt;-> web-application
+
+<P>The $http_handler sends out the retrieved information and then breaks
+<BR>the connection.
+
+<P>In addition, the web-application commonly will call individual
+<BR>objects. For instance, the $standard_webviewer calls &lt;object>:html()
+<BR>and the $std_vrml10viewer calls &lt;object:get_vrml() to retrieve
+<BR>appropriate information about the object's current state. Objects
+<BR>usually supply fragments of the final text that is compiled by the
+<BR>web-application and sent back to the $http_handler.
+
+<P>The following components of the web system have their own core help
+<BR>texts:
+
+<P><A HREF="../../DU MOO/web site/educore/database/manuals/core_help.html#$http_port">$http_port</A>
+-- listens on a MOO port for HTTP transactions
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/core_help.html#$http_handler">$http_handler</A>
+-- determines what type of resource is being requested
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(eg. HTML or VRML), retrieves the relevent data
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(possibly using a $webapp), sends out the info and
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+closes the connection
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/core_help.html#$webapp">$webapp</A>
+-- The "web applications" that generate the text
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+returned for a web transaction.
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/core_help.html#$frame_manager">$frame_manager</A>
+-- Performs various functions related to building
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+frames on the user's web page and placing the proper
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+information in each.
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/core_help.html#$jclient_handler">$jclient_handler</A>
+-- Carries the verbs and data used to allow telnet
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+clients written in Java to connect to the MOO,
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+and interact appropriately. Each telnet client
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+uses a different child of the $jclient_handler.
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/core_help.html#$std_vrml10viewer">$std_vrml10viewer</A>
+-- This webapp displays a static VRML/1.0 view of a
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+given room. Although it will pass VRML/2.0
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+information, it doesn't have any facilities for
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+live VRML display control. It does dynamically
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+create the room view, though, so
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+the returned VRML file describes the room at the
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+moment of the request.
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/core_help.html#$html_editor">$html_editor</A>
+-- A child of the generic editor that specifically
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+writes to object's associated URL/HTML data
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(#1.url).
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/user_help.html#$web_options">$web_options</A>
+-- Options package for setting various
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+user-customizable aspects of the web system.
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/user_help.html#$web_utils">$web_utils</A>
+-- A collection of utility verbs used by the web
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+system and web system programmers
+<BR>Webpass Handler - The object that stores temporary web passwords for
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+users interacting with the MOO's web system (no
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+further help text is available for this object).
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Referenced as $http_handler.webpass_handler
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/core_help.html#$teleporter">$teleporter</A>
+-- The General Teleporter object is used by the web
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+system to move characters when they teleport. It
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+is a general purpose tool for this, though, and
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+can be used by non-BioGate systems.
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/core_help.html#$anon_webviewer">$anon_webviewer</A>
+-- A Web Viewer that allows anonymous web
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+transactions to be used to browse the MOO. This
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+web viewer presents the MOO's rooms much like the
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+$standard_webviewer, but doesn't require the
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+transactions be authenticated. It does not allow
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+users to manipulate objects, only to examine them
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+in ways that don't change any of their
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+characteristics.
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/core_help.html#$standard_webviewer">$standard_webviewer</A>
+-- The default web viewer for browsing the MOO
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+with authenticated transactions. It dynamically
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+creates web pages displaying the rooms and other
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+objects found in the MOO.
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/core_help.html#integrated-web-telnet">integrated-web-telnet</A>
+-- Describes the innards of the integrated
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+web/telnet system, using the Cup-O MUD Java
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+telnet client as an example.
+
+<P>Additional topics:
+
+<P><A HREF="../../DU MOO/web site/educore/database/manuals/prog_help.html#web">web</A>
+-- introduction to the MOO's web system
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/user_help.html#@web-options">@web-options</A>
+-- user options for cutomizing web system actions
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/prog_help.html#web-programming">web-programming</A>
+-- how to program objects to be "web aware"
+<BR><A HREF="../../DU MOO/web site/educore/database/manuals/core_help.html#web-security">web-security</A>
+-- how the web system's authentication system works
+<H2>
+<A NAME="integrated-web-telnet"></A>integrated-web-telnet</H2>
+The integrated web/telnet system uses frames to divide the user's web
+<BR>browser window into sections, and has the browser load different
+<BR>functional units of the system into different frames. At a minimum,
+<BR>frames are used for displaying an HTML document (in the web frame)
+<BR>and a Java-based Telnet applet (in the live interaction frame, aka
+<BR>telnet frame).
+
+<P>This text describes the system that builds and manages the integrated
+<BR>interface display. See the BioGate System installation instructions
+<BR>for instructions on setup.
+
+<P>The trajectory of the web transaction that creates the user display
+<BR>is as follows:
+
+<P>&lt;http_port>:do_login_command -> $http_handler:handle_http10
+<BR>&nbsp;:handle_http10 checks if the transaction is an authentication
+<BR>request (empty URI with a form submitted), and if it is then looks,
+<BR>using a call to $http_handler:preprocess_URL, to see if there is an
+<BR>"integrated_web_interface" form entry (the value is ignored. This
+<BR>may be present because the name of the SUBMIT button for the
+<BR>integrated interface on the web Gateway page is
+<BR>"integrated_web_interface" so if the user selects that button then
+a
+<BR>form entry with that name will be included. If they select the
+<BR>button for an independent web window (usually named
+<BR>"independent_web_window") then that would be the form entry included
+<BR>instead).
+
+<P>&nbsp; If the integrated web interface has been selected, the
+<BR>authentication is set to $no_one (anonymous), the URI is set to
+<BR>"/frame_mgr/0/frameset" and the transaction continues based on the
+<BR>new value.
+
+<P>&nbsp;-> $http_handler:process -> $frame_manager:method_post
+<BR>&nbsp;&nbsp; -> $frame_manager:make_frameset
+<BR>The :make_frameset verb builds the HTML page including the &lt;FRAMESET>
+<BR>tags, defining the frames layout. It checks the submitted form for
+<BR>an entry named "client" and uses the value (a number) to determine
+<BR>the object number of the $jclient_handler to use. It also identifies
+<BR>an "interaction_frame_height" that is the percentage of the browser
+<BR>window taken up by the interaction frame, and any @weboption settings
+<BR>to be initialized after the user connects.
+
+<P>&nbsp;&nbsp; The :make_frameset verb then calls the
+<BR>&lt;jclient_handler>:preload_page to retrieve the URL for the HTML
+doc
+<BR>displayed in the web frame until the telnet client connects and sends
+<BR>its first "display url" command. The :preload_page verb checks the
+<BR>&lt;jclient_handler>.default_preload_page property. If it's a STR then
+<BR>it is assumed to be a URL for the preload page, else if it is a LIST
+<BR>it is assumed to be the text of
+
+<P>&nbsp; The :make_frameset verb specifies a URL for the interaction frame
+<BR>that includes the form data as a "method GET"-encoded form (appended
+<BR>to the URL after a "?"). This URL will cause the browser to retrieve
+<BR>a web page generated by $frame_manager:get_jclient_html the HTML page
+<BR>itself, in a separate transaction initiated automatically by the web
+<BR>browser when it seeks to fill the frames..
+<BR>&nbsp; The :get_jclient_html verb calls &lt;jclient_handler>:make_applet_html
+<BR>to retrieve the HTML text to be loaded into the "interaction frame"
+<BR>that contains the Java Telnet applet itself. This text typically
+<BR>contains the &lt;APPLET> section that loads the applet. The
+<BR>:make_applet_html verb extracts various applet settings from the
+<BR>submitted form, which are specific to the applet it handles. If the
+<BR>applet is capable of issuing a command upon connection tot he MOO,
+<BR>the :make_applet_html verb can use the user_name and password fields
+<BR>to issue a "preapproved &lt;username> &lt;password>" line that will
+<BR>automatically connect to the correct user. The password is a
+<BR>temporary password valid for only a few minutes after its generation,
+<BR>and issued specifically to allow the applet to automatically connect
+<BR>without giving away the user's true connect password.
+
+<P>&nbsp; To summarize, the presence of field named "integrated_web_system"
+<BR>in the submitted Gateway form leads to a &lt;FRAMESET> page being
+<BR>issued. The web frame contents are determined by
+<BR>&lt;jclient_handler>:preload_page and the interaction frame's contents
+<BR>are determined by &lt;jclient_handler>make_applet_html. Once the telnet
+<BR>applet connects, it is expected to issue an MCP "display-url"
+<BR>directive that replaces the top frame's contents with a view of the
+<BR>room the newly connected character is in.
+<H2>
+<A NAME="web-security"></A>web-security</H2>
+There are three alternative mechanisms for authentication that the
+<BR>web system can use. The method used depends on the setting of the
+<BR>"authentication_method" property on the $http_port that is handling
+<BR>the transaction Transactions through $login are assumed to be cookie
+<BR>authenticated unless $http_handler.login_is_http09 is true, in which
+<BR>case they are webpass authenticated. Note that for HTTP/0.9
+<BR>transactions, only webpass authentication is available, and that
+<BR>$login can't perform web-authentication. Alternative settings are:
+<BR>webpass, cookies, and web-authentication. The "cookies" setting is
+<BR>strongly recommended. Information on web cookie authentication may
+<BR>be found at "http://home.netscape.com/newsref/std/cookie_spec.html"
+<BR>and on web authentication in the IETF draft for HTTTP/1.0
+<BR>specification 3 (draft-ietf-http-v10-spec-03.html).
+
+<P>1. URL-embedded "webpass" system
+
+<P>In this system, a password is embedded into the URL for the
+<BR>transaction. A webpass of "anon" or "anonymous" always gives the
+<BR>transaction the permissions of $noone. The webpass is a temporary
+<BR>value associated with the user for the duration of the session. It
+<BR>is erased from the $http_handler.webpass_handler database when the
+<BR>user disconnects from their character. Since the temporary webpass
+<BR>appears within the URL, visible to whoever is looking over the user's
+<BR>shoulder, it is not as secure as the web cookie system.
+
+<P>2. web cookie system
+
+<P>In this system, a temporary webpass is generated but appears as a web
+<BR>cookie within the header lines of the transaction, and not in the
+<BR>URL. If an $http_port is set to use web cookies and the user's
+<BR>browser doesn't recognize them, then the system automatically uses
+<BR>URL-embeded webpasses instead. Detection of the browser's web cookie
+<BR>function is performed by sending a cookie (named "cookies_ok") with
+<BR>the gateway page, and then checking for it on the subsequent
+<BR>authentication form submission. If the browser can't handle web
+<BR>cookies, then the system automatically switched to URL-embedding of
+<BR>the webpass. The web cookie system is considered the most secure and
+<BR>recommended for general use.
+<BR>&nbsp; Note that users can "clear" their authentication in two ways
+under
+<BR>the web cookie system. One is to chose the "List of Application"
+<BR>where there is a button that performs this task. The other is to
+<BR>return the the MOO's gateway page. A "clear" cookie is always sent
+<BR>to the user's browser when that page is sent by the MOO, insuring
+<BR>that the user can reauthenticate without any lingering cookies to
+<BR>complicate the process.
+
+<P>3. "web authentication" system
+
+<P>This uses the authentication method given in the HTTP/1.0
+<BR>specification. As stated there, it is not intended for highly secure
+<BR>activity since the password is essentially sent in the clear, even
+<BR>though it is hidden from the casual user by its incorporation into
+<BR>the HTTP header lines. In this system, the user is presented by the
+<BR>browser with a request for their character's name and password. This
+<BR>information is thereafter included in every transaction to the MOO
+<BR>until the browser is reinitialized, generally by quitting and
+<BR>restarting. For this reason, this "web authentication" method is not
+<BR>recommended, although it is a capability of the BioGate System.
+<H2>
+<A NAME="web-system"></A>web-system</H2>
+See: <A HREF="#biogate-system">biogate-system</A>
+</BODY>
+</HTML>
+

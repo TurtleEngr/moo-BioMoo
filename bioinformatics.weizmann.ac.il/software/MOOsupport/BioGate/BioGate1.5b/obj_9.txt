@@ -1,0 +1,128 @@
+"Compiled generic note (#9) at Fri Jul 18 21:29:15 1997 IDT";
+"  The $note:html verb will only show text to calls with";
+"$note:is_readable_by perms.";
+"  The $note:html verb tests for the presence of a property on $note";
+"called 'content_type' and if it is either not defined or has a value";
+"of 'TEXT/PLAIN' then the text is treated as <PRE> but with linebreaks";
+"added  This will handle most MOO notes for now. A more complete";
+"MIME-like treatment still needs to be developed.";
+
+@prop $note."content_type" "TEXT/PLAIN" rc BioGate_wizard
+"The following property should already be defined on the object, with perms 'rc' and owner BioGate_wizard";
+@set $note.vrml_desc to {"WWWInline {name \"http://www.cco.caltech.edu/~mercer/vrml/note.wrl\"}"}
+ 
+@verb $note:"html" this none this rx BioGate_wizard
+@program $note:html
+"html(who, what, rest, search) -> HTML doc LIST";
+"If rest='read' then returns the note's text, otherwise pass(@args)";
+"which should return it's description.";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+who = args[1];
+rest = args[2];
+search = args[3];
+set_task_perms(caller_perms().wizard ? player | caller_perms());
+"if the webcall has no command, quickly pass back a result";
+if (!rest && !search)
+  return pass(@args);
+endif
+text = {};
+if (rest == "read")
+  text = typeof(text = this:text() || "(the note is blank)") == LIST ? text | {text};
+  "should support other MIME types at some point";
+  if (this.content_type in {E_PROPNF, "TEXT/PLAIN"})
+    text = $web_utils:preformat($web_utils:entity_sub(text));
+  endif
+  if ("embedVRML" in player.web_options)
+    text = {"<BR CLEAR=\"RIGHT\">", @text};
+  endif
+endif
+return text;
+"Last modified Thu Aug 15 09:24:51 1996 IDT by EricM (#3264).";
+.
+ 
+@verb $note:"verbs_for_web" this none this rx BioGate_wizard
+@program $note:verbs_for_web
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+return {"<P><B>Actions:</B><BR>", "<A HREF=\"&LOCAL_LINK;/" + "view" + "/" + tostr(tonum(this)) + "/read#focus\">Read</A> " + this:name(1) + "<BR>"};
+"Last modified Sat May  6 18:54:34 1995 IDT by Gustavo (#2).";
+.
+ 
+@verb $note:"object_edit_for_web" this none this rxd BioGate_wizard
+@program $note:object_edit_for_web
+"Return a web form for editing the note";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+if (!(caller in {this, $object_browser}))
+  return E_PERM;
+endif
+what = args[1];
+form = {tostr("<A NAME=\"#NoteTop\"><H3>", "<IMAGE SRC=\"http://www.cco.caltech.edu/~mercer/images/icons/note.gif\">", "Characteristics for Notes: ", what:name(), " (", what, ")</H3></A>")};
+if (!what:is_writable_by(player))
+  return {@form, "<B>This note is not writable by you.</B>"};
+endif
+form = {@form, tostr("<FORM METHOD=\"POST\" ACTION=\"&LOCAL_LINK;/", $object_browser:get_code(), "/", tonum(what), "/", tonum($code_utils:verb_location()), "\">")};
+form = {@form, "<INPUT TYPE=\"HIDDEN\" NAME=\"action\" VALUE=\"do_edit_object\">"};
+form = {@form, "<INPUT TYPE=\"SUBMIT\" VALUE=\"Update note text\"><INPUT TYPE=\"RESET\" VALUE=\"Restore original note text\"><P>"};
+form = {@form, "<H2>Text of note:</H2>"};
+form = {@form, "<TEXTAREA NAME=\"note_text\" ROWS=15 COLS=74>"};
+form = {@form, @what:text(), "</TEXTAREA></FORM>"};
+return {"NoteTop", form};
+"Last modified Thu Aug 15 09:36:31 1996 IDT by EricM (#3264).";
+.
+ 
+@verb $note:"edit_object_by_web" this none this rd BioGate_wizard
+@program $note:edit_object_by_web
+"edit_object_by_web(what OBJ, form field names LIST, form field values LIST) -> NUM or STR";
+"Takes web form data and extracts out the field 'note_text' which";
+"is used to set the note's text. Edits values on object 'what' according to form values.";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+what = args[1];
+perms = caller_perms();
+if (caller != $object_browser && !$perm_utils:controls(perms, $code_utils:verb_perms()))
+  "Accept calls only from $object_browser and the owner of the the person who wrote this (usually the owner of the generic object it's defined on).";
+  return E_PERM;
+elseif (!what:is_writable_by(perms))
+  return "Sorry, you don't have permission to write text to this note.";
+endif
+set_task_perms(perms);
+field_names = args[2];
+field_values = args[3];
+if (i = "note_text" in field_names)
+  result = what:set_text(field_values[i]);
+  result = typeof(result) == NUM ? !result | tostr(result);
+endif
+return result;
+"Last modified Thu Aug 15 09:46:09 1996 IDT by EricM (#3264).";
+.
+ 
+@verb $note:"get_icon" this none this rx BioGate_wizard
+@program $note:get_icon
+"Return the 'note' icon if there is any text on the note, any args have been given, or a non-generic icon has been specified, else none.";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+return !is_clear_property(this, "icon") || this:has_text() || args ? pass(@args) | "";
+"Last modified Thu Aug 15 09:22:19 1996 IDT by EricM (#3264).";
+.
+ 
+@verb $note:"has_text" this none this rx BioGate_wizard
+@program $note:has_text
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+cp = caller_perms();
+if (!$perm_utils:controls(cp, this) && !this:is_readable_by(cp))
+  return E_PERM;
+elseif (this.text)
+  "shouldn't have to read the text to determine if there is any";
+  return 1;
+elseif (this.external)
+  return !!`call_function("fileread", this.path, tostr(this), 1, 1) ! ANY';
+else
+  return !!length(this:text());
+endif
+"Last modified Tue Jul  1 20:01:31 1997 IDT by EricM (#3264).";
+.
+ 
+@verb $note:"has_url" this none this rx BioGate_wizard
+@program $note:has_url
+"Return 1 if note has text and is readable, else 0";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+return pass(@args) || (this:is_readable_by(player) && this:has_text());
+"Last modified Thu Aug 15 09:17:38 1996 IDT by EricM (#3264).";
+.

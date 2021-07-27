@@ -1,0 +1,122 @@
+<HTML>
+<HEAD>
+<TITLE>BioMOO Web Gateway Page</TITLE>
+</HEAD>
+<BODY>
+
+<A NAME ="top" HREF="http://bioinformatics.weizmann.ac.il/BioMOO/"><IMG SRC="http://together.net/~phansen/biobanner2.gif" BORDER=0></A>
+
+<H1>BioMOO's Web Gateway Page</H1>
+
+If you are already familiar with this system, use one of these quick connect options:
+
+<UL>
+<LI><A HREF="#authform">Web-cookie authentication system (<B>recommended</B>)</A>
+<LI><A HREF="http://bioinfo.weizmann.ac.il:8001/?anon">Continue anonymously</A>
+<LI><A HREF="http://bioinfo.weizmann.ac.il:8000">Web authentication system</A>
+</UL>
+
+Visit the <A HREF="http://bioinformatics.weizmann.ac.il/BioMOO/">BioMOO Home Page</A> for more information about this virtual meeting place for biology professionals.
+
+<HR>
+
+<H3>About the BioGate System: a web interface for MOOs</H3>
+
+BioMOO's multimedia interface (the BioGate System) lets you <B>see</B> what's in BioMOO as well as providing an intuitive mechanism for navigating this virtual space and exploring the objects within it.  We suggest you combine live interaction within the MOO and a multimedia web-based display, either with <A HREF="#split_interface">separate windows</A> (any web browser) or by using the integrated telnet/web system (only for browsers with Java support).  If you can't or don't choose to use the live interaction and web page display features together, you can access live interaction alone using a <A HREF="telnet://bioinformatics.weizmann.ac.il:8888">telnet helper application</A>, or <A HREF="http://bioinfo.weizmann.ac.il:8001/?anon">anonymously browse the MOO</A> using any web browser.<P>
+
+<B>Important note:</B> If you are using a very outdated web browser, it is very possible that some of BioMOO's web features may not work for you.  You might not even be able to connect at all.  BioMOO's web system works with any HTML 2.0 complient client.  It has been tested with Netscape Navigator, MS Internet Explorer, NCSA Mosaic, and Lynx. Support for PC, Mac, and Unix operating systems are generally the same (except for Java applet support)
+
+<HR>
+
+<H3><A NAME="authform">Authentication Form</A></H3>
+
+Please enter your BioMOO username and password below.<P>
+<FORM NAME="identify" METHOD="POST" ACTION="http://bioinfo.weizmann.ac.il:8001">
+
+<INPUT TYPE="TEXT" NAME="user_name" VALUE="anonymous"> <B>User's name</B><BR>
+<INPUT TYPE="PASSWORD" NAME="password"> <B>User's password</B><BR>
+
+<INPUT NAME="independent_web_window" TYPE="SUBMIT" VALUE="Open an independent web browser window into BioMOO"><P>
+If your web browser supports Java (including telnet applets), you can alternatively:<BR>
+<INPUT NAME="integrated_web_interface" TYPE="SUBMIT" VALUE="Open an integrated telnet/web window into BioMOO"><P>
+<HR>
+
+<H3>Settings for the Integrated Telnet/Web Interface</H3>
+
+The integrated telnet/web system builds a web page with frames containing a web page display and a telnet client written in Java.  Your web browser must support Java telnet applets for the system to function correctly.  Although you can leave them set to the default values, the following settings are available if you wish to customize the integrated telnet/web system's display:<P>
+
+<!-- the value of "client" is the object number of the Cup-O MUD handler; this is REQUIRED for the integrated interface to work -->
+<INPUT TYPE="HIDDEN" NAME="client" VALUE="1214">
+
+<B>Interaction Frame Height</B> <SELECT Name="interaction_frame_height">
+<OPTION VALUE="20">20% <OPTION VALUE="30">30% <OPTION VALUE="40" SELECTED>40%
+ <OPTION VALUE="50">50% <OPTION VALUE="60">60% 
+</SELECT><BR>
+Height in percentage of the total window taken up by the interaction frame.  The interaction frame is the bottom-most frame, where you can enter commands and have real-time interaction with BioMOO and the other people inside.<P>
+
+<INPUT TYPE="CHECKBOX" NAME="embedVRML"> <B>Embed a VRML view in the web page!!</B>  Select this if you have a VRML plug-in installed (Live3D for Netscape Navigator, or the MS Internet Explorer's own VRML plug-in each work great).  If you change your mind later, the command "@weboption -embedVRML" will cancel the embedded VRML box.<P>
+
+<INPUT CHECKED TYPE="CHECKBOX" NAME="echo"> <B>Echo input</B><BR>
+<B>Prefix</B> (optional): <INPUT NAME="prefix" value="" SIZE=5><BR>
+If checked, client echoes your input.  The client can prefix those lines with some specified text.<P>
+
+<B>Output Window</B><BR>
+Foreground Color <INPUT NAME="output_fgcolor" SIZE=10> 
+Background Color <INPUT NAME="output_bgcolor" SIZE=10><BR>
+<B>Input Window</B><BR>
+Foreground Color <INPUT NAME="input_fgcolor" SIZE=10> 
+Background Color <INPUT NAME="input_bgcolor" SIZE=10><BR>
+The colors for the text (foreground) and the window behind it (background).  Colors are specified like in web pages as an RGB triplet (000000=black, FFFFFF=white, 7F7F7F=gray).  If you don't specify a color, your system's defaults will be used.<P>
+
+<B>Font:</B> <INPUT NAME="font" SIZE=20 VALUE="Courier.12"><BR>
+You can specify a font in the form Courier-italic.10 where the style and size are optional.  For instance, Courier.10 and Courier-italic are OK too.  Only fonts, styles and sizes available on your own system are meaningful.  Note that the Java implementation on many systems is rather weak in font support, and not all your system's fonts may be accessible.  Some that seem to work well are:
+<DL COMPACT>
+<DT> Win95 <DD> Courier.10, Arial.12, Modern.12, Garamond.12, Times New Roman.12
+<DT> WinNT <DD> Courier.10, ?
+<DT> Unix <DD> Courier.10, ?
+</DL>
+
+<INPUT TYPE="HIDDEN" NAME="waitfor" VALUE="***">
+<!-- The text that the client will wait for before displaying any lines.  Leaving this value at its default will hide the initial connection splash message.
+To see that message, delete the default value.  If you set it to some value the MOO never outputs, the client won't show you anything ever,
+so either the default value or blank are probably the only things this should be set to.
+ -->
+
+<INPUT CHECKED TYPE="CHECKBOX" NAME="MCP_on">
+ <B>MCP commands accepted</B><BR>
+If checked, client responds to MCP commands.  This allows the client to perform some automatic functions with your web browser.  Selecting this is <B>highly recommended</B>, since that lets the MOO automatically update your web window when appropriate.<P>
+
+</FORM>
+<HR>
+
+<H3><A NAME="split_interface">Separate Telnet and Web Windows</A></H3>
+
+If you have a MUD/MOO client you prefer, you will probably want to combine it with a web page display but with separate windows.  In the instructions below, items in angle brackets should be replaced with the indicated information, omitting the brackets.
+
+<OL>
+<LI> Establish a live interaction connection to BioMOO using either <A HREF="telnet://bioinfo.weizmann.ac.il:8888">telnet</A> or a specialized <A HREF="http://www.math.okstate.edu/~jds/mudfaq-p2.html">client program</A> (if you have one)
+<LI> In the telnet/client window, enter BioMOO as follows:
+<OL TYPE=a><LI> If you have a registered userid at BioMOO, connect using "connect &lt;name&gt; &lt;password&gt;" where &lt;name&gt; is your userid, and &lt;password&gt; is your password (omit the angle brackets).
+<LI> If you are instead visiting BioMOO as a guest (with a temporary userid) connect using "guest &lt;name&gt; &lt;password&gt;" where &lt;name&gt; will be your temporary userid, and &lt;password&gt; will be the password you enter for the web authentication system in the next step (make one up).</OL>
+<LI> Then open a multimedia window by <A HREF="#authform">going to the authentication form</A> on this page, entering your &lt;name&gt; and &lt;password&gt; in the appropriate fields, and selecting the button labelled "Open a web window into the MOO.".
+<LI> Welcome to BioMOO! Feel free to explore.
+</OL>
+
+NOTE:  If you already have connected as a guest but didn't supply a password, you can type "@webpass" to be issued a numeric password that can be entered into the authentication form's password field in step three above.<P>
+
+Notice that you will have TWO windows open into BioMOO. One (using telnet or a specialized client) is a real-time, text-only window, and the other (using the web brower) is a multimedia web window.  The text window will automatically update when you move through BioMOO using the web window.  You can select the "Look Around" button at the top of the web window to refresh that view if you move using the text window instead
+
+<HR><P>
+
+<A HREF="http://www.cco.caltech.edu/~mercer/htmls/ConnectingByWeb.html">A separate page of instructions</A> is available, which includes some screen captures of sample sessions.<P>
+
+Go to the <A HREF="#top">top of this page</A><BR>
+
+Return to <A HREF="http://bioinfo.weizmann.ac.il/BioMOO/">BioMOO's home page</A><P>
+
+Please report any problems to:
+<A HREF="http://bioinformatics.weizmann.ac.il/Gustavo">Gustavo Glusman</A><BR>
+at <A HREF="mailto:Gustavo@bioinformatics.weizmann.ac.il">Gustavo@bioinformatics.weizmann.ac.il</A>
+
+</BODY>
+</HTML>

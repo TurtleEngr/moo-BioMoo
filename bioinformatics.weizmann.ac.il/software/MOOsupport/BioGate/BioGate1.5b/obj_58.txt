@@ -1,0 +1,16 @@
+"Compiled generic wizard (#58) at Fri Jul 18 21:29:40 1997 IDT";
+"  The $wiz:moveto verb has a hook to allow legitimate objects,";
+"primarily MOO text editors, to move wizard characters.  You'll need";
+"to add the BioWeb package's HTML Editor to that list of legitimate";
+"objects.";
+"  The BioMOO $wiz:moveto verb is reproduced here for context only.";
+"Line 1 shows the appearance of $html_editor in the list of permitted";
+"callers.";
+
+ 
+@verb $wiz:"moveto" this none this rx BioGate_wizard
+@program $wiz:moveto
+set_task_perms(caller in {this, $generic_editor, $verb_editor, $mail_editor, $note_editor, $html_editor, $helptext_editor} ? this.owner | caller_perms());
+return move(this, args[1]);
+"Last modified Sat Feb  4 11:17:28 1995 IST by EricM (#3264).";
+.

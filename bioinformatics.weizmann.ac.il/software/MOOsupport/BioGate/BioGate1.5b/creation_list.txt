@@ -1,0 +1,113 @@
+"List of objects to be created, ordered with parent objects first";
+ 
+"Create 'Webpass handler' (#2425@BioMOO) from parent 'Root Class Object' (#1@BioMOO)";
+@create #1 named Webpass handler, webpassHandler
+@grant webpassHandler to BioGate_owner
+ 
+"Create 'generic WWW application' (#3072@BioMOO) from parent 'generic thing' (#5@BioMOO)";
+@create $thing named generic WWW application, gwa
+@corify gwa as $webapp
+@grant gwa to BioGate_owner
+ 
+"Create 'Viewer Customiser' (#3237@BioMOO) from parent 'generic WWW application' (#3072@BioMOO)";
+@create gwa named Viewer Customiser, wcu
+@corify wcu as $webviewer_cstm
+@grant wcu to BioGate_owner
+ 
+"Create 'Who's On-line (HTML 3.0)' (#3260@BioMOO) from parent 'generic WWW application' (#3072@BioMOO)";
+@create gwa named Who's On-line (HTML 3.0), wwt
+@corify wwt as $web_who
+@grant wwt to BioGate_owner
+ 
+"Create 'general teleporter object' (#4002@BioMOO) from parent 'generic thing' (#5@BioMOO)";
+@create $thing named general teleporter object, $teleporter
+@corify $teleporter as $teleporter
+@grant $teleporter to BioGate_owner
+ 
+"Create 'General Info Provider' (#3394@BioMOO) from parent 'generic WWW application' (#3072@BioMOO)";
+@create gwa named General Info Provider, gip
+@corify gip as $web_geninfo
+@grant gip to BioGate_owner
+ 
+"Create 'Assorted Web Commands' (#3417@BioMOO) from parent 'Generic Feature Object' (#74@BioMOO)";
+@create $feature named Assorted Web Commands, webFO
+@grant webFO to BioGate_owner
+ 
+"Create 'WWW Options' (#3830@BioMOO) from parent 'Generic Option Package' (#67@BioMOO)";
+@create $generic_options named WWW Options, weboptions
+@corify weboptions as $web_options
+@grant weboptions to BioGate_owner
+ 
+"Create 'webMOO code utilities' (#3909@BioMOO) from parent 'generic utility' (#1579@BioMOO)";
+@create $generic_utils named webMOO code utilities, web_utils
+@corify web_utils as $web_utils
+@grant web_utils to BioGate_owner
+ 
+"Create 'Generic HTTP/1.0 Port Listener' (#711@BioMOO) from parent 'generic thing' (#5@BioMOO)";
+@create $thing named Generic HTTP/1.0 Port Listener, listener
+@corify listener as $http_port
+@grant listener to BioGate_owner
+ 
+"Create 'Standard VRML/1.0 Viewer' (#3383@BioMOO) from parent 'generic WWW application' (#3072@BioMOO)";
+@create gwa named Standard VRML/1.0 Viewer, vrml_view
+@corify vrml_view as $std_vrml10viewer
+@grant vrml_view to BioGate_owner
+ 
+"Create 'VRML Utilities' (#3384@BioMOO) from parent 'generic utility' (#1579@BioMOO)";
+@create $generic_utils named VRML Utilities, vrml_utils
+@corify vrml_utils as $vrml_utils
+@grant vrml_utils to BioGate_owner
+ 
+"Create 'Generic JavaClient Handler' (#2380@BioMOO) from parent 'generic thing' (#5@BioMOO)";
+@create $thing named Generic JavaClient Handler, gjh
+@corify gjh as $jclient_handler
+@grant gjh to BioGate_owner
+ 
+"Create 'Cup-O MUD handler' (#1214@BioMOO) from parent 'Generic JavaClient Handler' (#2380@BioMOO)";
+@create gjh named Cup-O MUD handler, comh
+@grant comh to BioGate_owner
+ 
+"Create 'Frame Manager' (#3095@BioMOO) from parent 'generic WWW application' (#3072@BioMOO)";
+@create gwa named Frame Manager, frame_mgr
+@corify frame_mgr as $frame_manager
+@grant frame_mgr to BioGate_owner
+ 
+"Create 'MCP Utilities' (#1768@BioMOO) from parent 'generic thing' (#5@BioMOO)";
+@create $thing named MCP Utilities, mcp
+@corify mcp as $mcp
+@grant mcp to BioGate_owner
+ 
+"Create '<I><B>Be our Ghost! </B></I> - anonymous web viewer' (#1297@BioMOO) from parent 'generic WWW application' (#3072@BioMOO)";
+@create gwa named <I><B>Be our Ghost! </B></I> - anonymous web viewer, anonview
+@corify anonview as $anon_webviewer
+@grant anonview to BioGate_owner
+ 
+"Create 'Mail Browser' (#2048@BioMOO) from parent 'generic WWW application' (#3072@BioMOO)";
+@create gwa named Mail Browser, mb
+@corify mb as $mail_browser
+@grant mb to BioGate_owner
+ 
+"Create 'HTTP Handler' (#98@BioMOO) from parent 'generic WWW application' (#3072@BioMOO)";
+@create gwa named HTTP Handler, HTTP_hndlr
+@corify HTTP_hndlr as $http_handler
+@grant HTTP_hndlr to BioGate_owner
+ 
+"Create 'User Information Customiser' (#1417@BioMOO) from parent 'generic WWW application' (#3072@BioMOO)";
+@create gwa named User Information Customiser, info_cstm
+@corify info_cstm as $webchar_cstm
+@grant info_cstm to BioGate_owner
+ 
+"Create '<B>Standard Web Viewer</B>' (#1819@BioMOO) from parent 'generic WWW application' (#3072@BioMOO)";
+@create gwa named <B>Standard Web Viewer</B>, webviewer
+@corify webviewer as $standard_webviewer
+@grant webviewer to BioGate_owner
+ 
+"Create 'Object Browser/Editor' (#2394@BioMOO) from parent 'generic WWW application' (#3072@BioMOO)";
+@create gwa named Object Browser/Editor, obe
+@corify obe as $object_browser
+@grant obe to BioGate_owner
+ 
+"Create 'HTML Editor' (#2789@BioMOO) from parent 'Generic Editor Object' (#51@BioMOO)";
+@create $generic_editor named HTML Editor, HTMLeditor
+@corify HTMLeditor as $html_editor
+@grant HTMLeditor to BioGate_owner

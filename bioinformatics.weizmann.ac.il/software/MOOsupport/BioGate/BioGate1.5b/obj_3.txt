@@ -1,0 +1,169 @@
+"Compiled generic room (#3) at Fri Jul 18 21:29:39 1997 IDT";
+"  The generic room's enterfunc verb should be slightly modified for";
+"the web system, so that the user does not see the room description in";
+"both the telnet and web windows when they change rooms (because it's";
+"spammy and a waste of bandwidth).";
+"  See the comments in the verb below for more details.  Note that the";
+"entire verb from BioMOO is reproduced here for context only.  Do NOT";
+"just paste in this whole script else it will over-write your own";
+"MOO's $room:enterfunc verb.  Everything here except the";
+"$room:enterfunc verb can be pasted in.";
+
+@prop $room."vrml_interior_desc" {"# room should be arrayed so that the floor is about 1.5 meters below the origin plane", "# objects at the origin should be at chest level or so", "Material { diffuseColor .7 .7 .7 } Transform { translation 0 -1.25 0 }", "Texture2Transform { scaleFactor 4 4 }", "Texture2 { filename \"http://www.cco.caltech.edu/~mercer/images/bkgds/woodfloor3.bmp\"}", "Cube { width 10 height 0.1 depth 10 }"} rc BioGate_wizard
+ 
+"  This is a modified LambdaCore verb such that if the task is a web";
+"call, the (noisy) this:look_self() verb is only called after";
+"temporary redirection of output to $no_one (ie. the bit bucket).  The";
+"user will see the relevent text in the web window so everything else";
+"is spam and bandwidth wastage.";
+"  DON'T just paste in this verb, but modify your own MOO's";
+"$room:enterfunc so that it doesn't show room descriptions like how";
+"the example given below doesn't.";
+ 
+@verb $room:"enterfunc" this none this rxd BioGate_wizard
+@program $room:enterfunc
+"enterfunc(object OBJ) -> none";
+"Clean up after this:bless_for_entry on $exit tasks.";
+"Modified so the output of this:look_self is redirected to $no_one";
+"on web calls instead of to the player's text window.";
+object = args[1];
+if (valid(object) && is_player(object))
+  "Since look_self directs output to player:tell, which is redundant";
+  "for a web call, direct the output to $no_one.  The viewer and";
+  "object:more_info_for_web should deal with any special information the";
+  "user needs besides the object's description.";
+  if ($web_utils:is_webcall())
+    conn = player;
+    player = $no_one;
+    this:look_self(object.brief);
+    player = conn;
+  else
+    object:tell();
+    this:look_self(object.brief);
+  endif
+  if ($object_utils:has_property(this, "entrance_msg") && (msg = this.entrance_msg))
+    object:tell_lines($string_utils:pronoun_sub(msg));
+  endif
+endif
+if (object == this.blessed_object)
+  this.blessed_object = #-1;
+endif
+"Last modified Sat Sep 16 22:39:58 1995 IDT by EricM (#3264).";
+.
+ 
+@verb $room:"tell_contents_for_web" this none this rx BioGate_wizard
+@program $room:tell_contents_for_web
+"tell_contents_for_web(contents LIST [, ctype NUM]) -> html text frg LIST";
+"Generate HTML text showing room's contents, including people and things.";
+"(note: ctype hasn't been implemented yet)";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+contents = args[1];
+ctype = args[2] || 0;
+text = {};
+code = $web_utils:get_webcode();
+eol = "<P>";
+people = things = {};
+for item in (contents)
+  if (is_player(item))
+    people = {@people, item};
+  else
+    things = {@things, item};
+  endif
+endfor
+if (this.dark)
+  "this section only applies to rooms with a .dark property set";
+  if (people || things)
+    text = {@text, tostr(things ? "There seem to be some objects about, but it's too dark to make them out." | "", people ? (things ? " " | "") + "In the darkness, you hear the faint sound of breathing." | "", eol)};
+  else
+    text = {@text, "The room is too dark to see much here." + eol};
+  endif
+else
+  if (things)
+    text = {@text, tostr("You see ", $web_utils:english_list_with_urls(player, code, things), "." + eol)};
+  endif
+  if (!$object_utils:isa(this, $generic_editor))
+    "Tell who else is here, unless player's in an editor";
+    stuff = $web_utils:list_english_list_with_urls(player, code, people, "nobody else");
+    text = {@text, length(people) ? "<B>" | "", tostr($string_utils:capitalize(stuff[1]), @stuff[2..length(stuff)], length(people) ? "</B>" | "", length(people) > 1 ? " are here." | " is here.", eol)};
+  endif
+endif
+return text;
+"Last modified Mon Apr 29 06:34:01 1996 IDT by EricM (#3264).";
+.
+ 
+@verb $room:"get_vrml" this none this rxd BioGate_wizard
+@program $room:get_vrml
+"get_vrml(who, rest STR, search STR) -> VRML nodes LIST";
+"Put together all the VRML nodes for this room, including those defining the room itself";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+vrml = {};
+cameras = {"DEF cameras Switch {", "  whichChild 0"};
+exits = this:exits();
+set_task_perms(caller_perms());
+if (caller == $std_vrml10viewer)
+  "--add the room's desc";
+  if (!(vrml_desc = this:get_vrml_interior_desc(@args)))
+    vrml_desc = {"# room should be arrayed so that the floor is about 1.5 meters below the origin plane", "# objects at the origin should be at chest level or so", "Material { diffuseColor .5 .5 .5 } Translation { translation 0 -1.25 0 } Cube { width 10 height 0.1 depth 10 }"};
+  endif
+  "--add node for the room itself";
+  vrml = {@vrml, tostr("Separator { # Room object ", this, "@", $network.MOO_name), @vrml_desc, "}"};
+  "--add node for each object in the room's contents list";
+  for item in ({@this:contents(), @exits})
+    $command_utils:suspend_if_needed(1);
+    vrml = {@vrml, tostr("Separator { # Object ", item, "@", $network.MOO_name)};
+    vrml = {@vrml, @item:get_vrml(@args), "}"};
+    if ($object_utils:isa(item, $player))
+      "--add a camera if 'player' is in the room";
+      item_name = $string_utils:substitute(item.name, {{" ", "_"}, {"{", "_"}, {"}", "_"}, {"#", "_"}, {"\"", "_"}});
+      camera = {tostr("DEF ", item_name, "_camera Separator {"), tostr("Transform { translation ", $vrml_utils:make_SFVec3f(item:get_vrml_translation()), " }")};
+      camera = {@camera, "PerspectiveCamera { position 0 0.75 -.5 }"};
+      camera = {@camera, "}"};
+      cameras = {@cameras, @camera};
+    endif
+  endfor
+  "add the cameras and close the Switch node";
+  vrml = {@cameras, " }", @vrml};
+  if ($set_utils:intersection($object_utils:ancestors(this), $web_utils.interior_rooms) && $object_utils:isa(this.location, $room))
+    "--add link to exterior room";
+    vrml = {@vrml, "DEF outlink Separator {", tostr(" WWWAnchor { description \"Out to ", this.location:name(1), "\" name \"&LOCAL_LINK;/", $web_utils:get_webcode(), "/", tonum(this.location), "/moveto/room.wrl\"")};
+    linkzone = typeof(linkzone = this:get_vrml_setting("linkzone") || $vrml_utils.std_linkzone) == STR ? {linkzone} | linkzone;
+    vrml = {@vrml, @linkzone, @$vrml_utils.std_outlink};
+    "--close the WWWAnchor and the whole Separator";
+    vrml = {@vrml, " }", "}"};
+  endif
+  "--add lights";
+  if (!(lights = this:get_vrml_setting("lights")))
+    lights = $vrml_utils.std_roomlights;
+  endif
+  vrml = {@typeof(lights) == STR ? {lights} | lights, "", @vrml};
+else
+  vrml = pass(@args);
+endif
+return vrml;
+"Last modified Tue Oct  1 03:36:20 1996 IST by EricM (#3264).";
+.
+ 
+@verb $room:"get_vrml_interior_desc set_vrml_interior_desc" this none this rxd BioGate_wizard
+@program $room:get_vrml_interior_desc
+"get_vrml_interior_desc(none) -> vrml file frg LIST";
+"set_vrml_interior_desc(desc LIST) -> resulting value LIST";
+"get or set the interior VRML description for an room; the VRML node that describes it";
+"to someone standing INSIDE it";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+if (verb[1..3] == "set")
+  desc = args[1];
+  if (!(caller == this || $perm_utils:controls(caller_perms(), this)))
+    return E_PERM;
+  elseif (typeof(desc) != LIST)
+    return E_INVARG;
+    "reject most obviously bad values";
+  endif
+  this.vrml_desc = desc;
+endif
+if (link = this:get_vrml_hyperlink(@args))
+  "add the object's associated hyperlink, if any";
+  return {@link, @this.vrml_interior_desc, " }"};
+endif
+return this.vrml_desc;
+"Last modified Thu Nov 23 02:43:06 1995 IST by EricM (#3264).";
+.

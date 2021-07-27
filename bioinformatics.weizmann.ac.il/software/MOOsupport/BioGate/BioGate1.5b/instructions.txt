@@ -1,0 +1,227 @@
+  The BioGate package is a set of software applications that allow a
+MOO to act as an HTTP server, and generate representations of the
+MOO's rooms as WWW pages.  The package and a license allowing its use
+is available from BioGate Partners free for non-commercial
+applications.  Please see the non-commercial or commercial licenses
+for more details.
+________
+
+IMPORTANT!!!  IMPORTANT!!!  IMPORTANT!!!  IMPORTANT!!!
+Don't even THINK about installing the BioGate System package until
+you've saved a copy of your database and set it aside as
+"pre-biogate.db" or some such name.  That way if any disaster occurs
+during the installation you can go back to that copy.  Although the
+BioGate System package is designed to be as safe to install as
+possible, every competent wizard knows that surprises do happen and
+surprises with wiz-perms are dangerous.  So, please, please, please
+back up your MOO before starting the BioGate System installation.
+________
+
+This installation is facilitated by a MUD/MOO client that allows you
+to either paste text into the client window, or even better, to paste
+the contents of text files to the MOO.  Recommended clients for this
+are zMUD 4.2 (Win3.1 & Win95, http://www.trail.com/~zugg/zmud.html),
+MudDweller 1.2 (Mac, ftp://ftp.eden.com//pub/users/hsoi/mud/muddweller-12.hqx),
+or tinyfuge (Unix).  Other client programs might work just fine; what
+you want is one that will load a file and send it to the MOO as your
+input.
+
+You must have a wizard character to install the package, since many
+of its verbs require wiz-perms.  There is no way to install the
+package unless you are a wizard on the MOO.  In addition, there are a
+few small changes to existing core verbs that need to be made to
+fully support the web system.  Therefore, you should have at least
+moderate programming skills to install this package.  Essentially,
+you should have skills enough to recognize if your MOO's code matches
+the example code given here, and enough knowledge to make any
+adjustments that are needed to adjust for your owns MOO's
+peculiarities (if any).
+
+The BioGate System will use the MOO File Utilities Package (FUP) if
+it's present and you've set it to use FUP.  More details are found in
+the instructions for particular objects.  FUP may be found at:
+ftp://bioinformatics.weizmann.ac.il/pub/software/MOOsupport/FUP/
+
+The package installation assigns all wizardly functions to a wizard
+called "BioGate_wizard" which you may want to create especially to
+own all Biogate wizardly verbs.  If not, add "BioGate_wizard" as an
+alias to whichever wizard character you want to own the Biogate
+System's wizardly verbs.  Similarly, all non-wizardly verb are owned
+by "BioGate_owner" which can be a dedicated character with that name
+or an alias of an existing non-wizardly character.  You MUST either
+create these characters or assign the names as aliases to existing
+characters before installing the package with the supplied scripts.
+
+Some MOO's have a $player:@set-note-text that will only recognize
+object references, which is generally a problem, and particularly a
+problem for the package installation.  Check that verb in your MOO
+for the lines:
+  11:  if (spec = $code_utils:parse_propref(argstr))
+  12:    o = toobj(spec[1]);
+  13:    p = spec[2];
+and if you see one like line 12 (line numbering may be different in your MOO), change it to:
+  12:    o = player:my_match_object(spec[1]);
+
+To install the BioGate package:
+
+1. Create the "BioGate_owner" character as a non-wizardly programmer,
+and the "BioGate_wizard" as a programmer wizard character (see notes
+on this above).  Make sure you give them enough quota (how much
+depends on the type of quota system you have).  Although no new
+objects are created for the BioGate System after the installation,
+the BioGate_owner will need to add properties to the Webpass Handler
+object, so if you use byte-based quota then make sure the
+BioGate_owner has a few extra thousand bytes for future additions.
+
+2. Connect to the "BioGate_wizard" character, and create the required
+objects.  The simplest method is to run the file "creation_list.txt"
+as a set of MOO commands; for example, paste the text of that file
+into your MOO window.  Note that the creation commands in that file
+include the addition of appropriate aliases that will be used later
+to install verbs and properties on these objects.  Some of the
+objects will be corified by this script, using the @corify command.
+
+NOTE: Some @create systems on some MOOs require you to use a command
+like "@measure new" after every ten objects are created.  If your MOO
+is like this, you'll want to run only portions of the
+creation_list.txt script at a time, feeding the MOO no more than 10
+objects per batch, and using the "@measure new" command after each.
+
+NOTE: When the objects are corified by the script, you may see a
+message like, "Generic WWW application has no :init_for_core verb.
+Strongly consider adding one before doing anything else."  Just
+ignore this, since the :init_for_core verbs will be added as
+appropriate during later steps in the installation.
+
+NOTE: The creation_list.txt script assumes you already have corified
+objects $thing, $feature, $generic_options, $generic_editor, and
+$generic_utils.  The $generic_utils is missing on some MOOs, but is
+just a child of #1 that serves as a parent for all the programming
+utility objects, but carries no verbs or properties itself.  If your
+MOO doesn't have one, just:
+  @create #1 named Generic Utilities, $generic_utils
+  @corify Generic Utilities as $generic_utils
+
+NOTE: The later scripts assume you are carrying the objects for which
+verbs and properties are added.  If you aren't carrying them (which
+and you SHOULD be carrying them after the creation script is run),
+they won't be added properly.
+
+3. IMPORTANT!!!  The following steps require you to program verbs and
+add properties, and the supplied obj_#.txt scripts make this mostly
+very simple.  HOWEVER, you should read the header for each obj_#.txt
+file since some scripts should absolutely not be run without
+comparing your MOO's code with sample code supplied.  In addition,
+the headers have instructions for setting up each object, and if you
+don't customize the objects appropriately for your MOO, the web
+system won't work.  You MUST read the headers on each file before
+installing it.  In addition to appearing at the top of each file, the
+object file headers are collected into a single file called
+"header_compilation.txt" also included in the package.
+
+3. Set up #1 with the appropriate properties and verbs.  The file
+"obj_1" is a script that will add all the appropriate properties
+and verbs.
+
+4. Set up the web package objects.  You should be able to just paste
+in the appropriate web package object files, though not before
+reading the header information on each file.  The header will also
+tell you which properties on the object need to be set, and to what
+value, after you've used the script to add all the needed verbs and
+properties.
+
+IMPORTANT! Set up the objects in the order given below, since some
+are derived from others and you MUST set up the parent objects before
+the child ones to insure the child objects have the appropriate
+properties.
+
+  Generic WWW Application ($webapp) obj_3072
+  HTTP Handler ($http_handler) obj_98
+  Viewer Customizer ($webviewer_cstm) obj_3237
+  Who's On-line (HTML 3.0) ($web_who) obj_3260
+  General Teleporter Object ($teleporter) obj_4002
+  General Info Provider ($web_geninfo) obj_3394
+  Assorted Web Commands FO (not core) obj_3417
+  WWW Options ($web_options) obj_3830
+  WebMOO Code Utiltiies ($web_utils) obj_3909
+  Standard Web Viewer ($standard_webviewer) obj_1819
+  Object Browser/Editor ($obj_browser) object_2394
+  Mail Browser ($mail_browser) obj_2048
+  Webpass Handler (not core) obj_2425
+  HTML Editor ($html_editor) obj_2789
+  Character Customiser ($webchar_cstm) obj_1417
+  MCP Utilties ($mcp) obj_1768
+  Frame Manager ($frame_manager) obj_3095
+  Standard VRML/1.0 Viewer ($std_vrml10viewer) obj_3383
+  VRML Utilities ($vrml_utils) obj_3384
+  Generic HTTP/1.0 Port Listener ($http_port) obj_711
+  Anonymous Web Viewer ($anon_webviewer) obj_1297
+  Generic JavaClient Handler ($jclient_handler) obj_2380
+  Cup-O MUD handler (not core) obj_1214
+
+5. Make the remaining changes in the LambdaCore objects already in
+your MOO.  This involves adding some new properties and verbs, and
+may require modifying some of the already existing verbs and
+properties on some core objects.  For each core object CAREFULLY READ
+THE HEADER FILE for that object before simply pasting in the
+associated package object file.  The object files are named for their
+BioMOO equivalents.  The relevant core objects are:
+
+  System Object ($sysobj) obj_0
+  Generic room ($room) obj_3
+  Generic Player/User ($player) obj_6
+  Generic Exit ($exit) obj_7
+  Generic Container ($container) obj_8
+  Generic Note ($note) obj_9
+  Generic Wizard/Administrator ($wiz) obj_58
+  Generic Editor Object ($generic_editor) obj_51
+  Help Database ($help) obj_3131
+  Core Utility Help ($core_help) obj_23
+  Programmer Help ($prog_help) obj_24
+  Login Commands ($login) obj_12
+  Everyman (aka Anonymous) ($no_one) obj_40
+  Time Utilities ($time_utils) obj_44
+  String Utilities ($string_utils) obj_20
+  Command Utilities ($command_utils) obj_57
+  Wizard Utilities ($wiz_utils) obj_26
+  Permissions Utilities ($perm_utils) obj_42
+
+The following objects are not part of LambdaCore but are nearly
+ubiquitous among MOOs, and support for them is provided by the BioGate
+package.  Note that if each object doesn't have the alias used in
+it's associated BioGate object file, you'll have to either add that
+alias, or edit the file.
+
+  Generic Interior Room obj_139
+  Generic Gopher Slate obj_206
+  Generic bulletin board obj_1200
+  Generic Sign obj_1438
+
+6. Start the MOO listening on a dedicated HTTP port, by creating a
+child of the $http_port and setting its ".handles_port" property to
+some appropriate value (8000 is the default).  Then "@startlistening
+on <port-listener>" and the MOO will start listening for HTTP
+connections.  Point your web browser to "http://your.moo.name:port/"
+and you should be served the gateway page (see the notes on the
+$http_handler for setting the gateway page).  You may also wish to
+add a call to your HTTP port's :server_started verb from
+#0:server_started, so the MOO automatically listens on that port when
+the server is restarted.
+
+7. If you wish to install the Cup-O MUD Telnet client written in
+Java, follow the instructions found as "cupOmud_installation.txt" in
+this package.
+
+8. Follow the instructions in the "biogate_initialization.txt" file,
+which describes various properties you can customize.
+________
+
+The BioGate Package is copyrighted by BioGate Partners [Copyright (c)
+1996 BioGate Partners].  It is available under a license for
+non-commercial use or under a different license for commercial use.
+The BioGate System may not be distributed without the writen
+permission of BioGate Partners.  See the license that applies to you
+for more details.
+
+The names BioGate and BioGate System are trademarks of BioGate
+Partners.

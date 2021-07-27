@@ -1,0 +1,23 @@
+"Compiled Anonymous (#40) at Fri Jul 18 21:29:45 1997 IDT";
+"  You'll probably want to rename $no_one to "Anonymous", adding the";
+"previous name and aliases as aliases.";
+"  In addition, to work with the";
+"webghost viewer properly, set the value of $no_one.web_options to";
+"include the ghostviewer as the specified viewer.  A good method is to";
+"enter:";
+"";
+"  ;$no_one.web_options = {"applinkdown","showdest",{"viewer",$anon_webviewer}}";
+"";
+"  If you want to allow anonymous access to the webapp";
+"list, make the special web passwords "anonymous" and "anon" point to";
+"$no_one.  First, set $http_handler.webpass_handler to the object";
+"number of the webpass handler.  Then you can:";
+"";
+";add_property($http_handler.webpass_handler, "anon", $no_one, {$http_handler.webpass_handler.owner,""})";
+";add_property($http_handler.webpass_handler, "anonymous", $no_one, {$http_handler.webpass_handler.owner,""})";
+"";
+"  This setup is not the default because some people will not wish to";
+"allow anonymous web browsing of their MOO.  Such anonymous browsing";
+"can't harm or otherwise interfere with the MOO, but it does use";
+"computing resources that might be precious if your MOO is laggy.";
+

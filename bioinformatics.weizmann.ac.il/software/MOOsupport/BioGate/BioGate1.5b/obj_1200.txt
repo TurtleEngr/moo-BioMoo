@@ -1,0 +1,22 @@
+"Compiled generic bulletin board (#1200) at Fri Jul 18 21:29:20 1997 IDT";
+"Generic bulletin board (the sort that takes posted $note objects)";
+
+ 
+@verb $bb:"more_info_for_web" this none this rx BioGate_wizard
+@program $bb:more_info_for_web
+"more_info_for_web( ) -> HTML doc LIST";
+"Generates an HTML doc fragment with a hyperlinked list of all notes posted";
+"to the bulletin board.";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+text = {"<P>"};
+if (this.contents == {})
+  text = {@text, this:no_notes_posted_msg()};
+else
+  for i in [1..length(this.contents)]
+    content = this.contents[i];
+    text = {@text, $string_utils:right(tostr(i), 5) + " - " + $string_utils:left(content.owner:namec(1) + ":  ", 15) + "<A HREF=\"&LOCAL_LINK;/view/" + tostr(tonum(content)) + "/read#focus\">" + content:namec() + "</A><BR>"};
+  endfor
+endif
+return text;
+"Last modified Wed Jul 12 09:24:27 1995 IDT by EricM (#3264).";
+.

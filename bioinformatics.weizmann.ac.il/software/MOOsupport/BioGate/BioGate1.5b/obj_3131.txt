@@ -1,0 +1,395 @@
+"Compiled Basic Help Database (#3131) at Fri Jul 18 21:29:30 1997 IDT";
+"  These verbs should either go on $help or on a parent of it. On";
+"$help is recommended.  The properties are typical texts for a";
+"LambdaCore help database.  If you are storing help texts on files";
+"outside the database using the FUP package, you'll have to put these";
+"there too using whatever scheme you used to externalize the core";
+"texts.";
+
+"The following LIST of STR value may be too long to set as one value.  It needs to be added using @set-note-text.";
+@prop $help."web" {} rc BioGate_wizard
+@set-note-text $help.web
+  The MOO's web access is based on the BioGate system and allows users to add and perceive multimedia information associated with MOO objects.
+
+ Some commands for adding and examining web links and HTML text associated with MOO objects are:
+
+@url -- examine or add a URL link 
+@html -- examine or add an HTML document
+@icon -- examine or add an icon link
+@weblink -- link an object via a text line or an image
+@htmledit -- use the HTML editor
+@set-web -- set various web characteristics of an object
+@webpass -- get or set a web password for HTTP/0.9 access
+@web-options -- get or set various web options for your MOO character
+VRML -- about the MOO's Virtual Reality Modeling Language capabilities
+.
+@prop $help."@html" {"*forward*", "@url"} rc BioGate_wizard
+"The following LIST of STR value may be too long to set as one value.  It needs to be added using @set-note-text.";
+@prop $help."@url" {} rc BioGate_wizard
+@set-note-text $help.@url
+Syntax: @url <object> is <url enclosed in double quotes>
+        @url for <object>
+        @html <object> is
+        @html for <object>
+        @vrml for <object>
+
+  These let you read or set the associated URL link, in-MOO HTML
+document, or VRML description associated with an object.  The "for"
+forms show you the current value, while the "is" forms let you set a
+new value.  The @vrml command only has a "for" form, and you should
+use @vrmledit to set an object's VRML description. Note that the URL
+specified in the "@url" command should be enclosed in double quotes.
+  Objects may have either a URL associated with them (generally
+pointing to either an image or an web page outside the MOO) or can
+have the text of an HTML document.  They cannot have both, but this
+is not a limitation since you can associate an HTML document with an
+object and that can have as many links to images or outside web pages
+that you wish.  Note that the format for entering an HTML document
+will cause you to be prompted for lines of that document.
+ IMPORTANT: The @vrml command will give you a room's interior VRML
+description if you're in the room at the time, else its exterior VRML
+description.
+
+Related commands:
+@htmledit -- use the HTML editor to enter an HTML document
+@weblink -- a quick way to automatically build a small HTML document
+            that uses either text or an image as the link to an
+            outside document.
+vrml -- information about the VRML system
+.
+@prop $help."@icon" {"Syntax: @icon <object> is <url enclosed in double quotes>", "        @icon for <object>", "", "  The command displays or sets the URL for the icon associated with", "an object.  Note that the URL must be enclosed in double quotes."} rc BioGate_wizard
+"The following LIST of STR value may be too long to set as one value.  It needs to be added using @set-note-text.";
+@prop $help."@htmledit" {} rc BioGate_wizard
+@set-note-text $help.@htmledit
+Syntax: @htmledit <object>
+
+  Moves you to the HTML Editor, allowing you to edit the HTML
+document associated with an object.  The HTML editor is mostly like
+the Note Editor. One difference is that the modes are "URL" (a single
+line of text only) or "HTML" (an HTML document of one or more lines).
+.
+"The following LIST of STR value may be too long to set as one value.  It needs to be added using @set-note-text.";
+@prop $help."@set-web" {} rc BioGate_wizard
+@set-note-text $help.@set-web
+Syntax: @set-web <setting name> on <object>
+
+  Allows you to set or read various settings associated with the web
+properties of an object.  These may be MOO-wide properties or ones
+specifically associated with a particular class of object.
+  If you omit the <setting name> you'll be presented with a list of
+all the web settings on the object and their current values.  If you
+specify a web setting by name you'll be prompted for the new value
+of that setting.
+
+MOO-wide Web Settings:
+
+bodytag_attributes
+  The attributes text of the <BODY> tag, used to set the background
+and text colors for the web page associated with an object. Note that
+objects take on the web background properties of the room they're in
+unless they have their own bodytag_attributes setting. An example:
+  BGCOLOR="#D0D0D0"  BACKGROUND="http://node.edu/images/sample.gif"
+
+hide_banner
+  Suppresses the MOO's banner within the web page generated for the
+object.  Any non-empty value for "hide_banner" will work.
+
+preformatted
+  If this web setting is present and not empty, the entire text of
+the HTML document associated with the object is wrapped in <PRE> ...
+</PRE> tags, indicating it should be displayed using a
+non-proportional font.
+
+.
+"The following LIST of STR value may be too long to set as one value.  It needs to be added using @set-note-text.";
+@prop $help."@weblink" {} rc BioGate_wizard
+@set-note-text $help.@weblink
+Syntax: @weblink <object> to <URL>
+
+  Used to associate an outside web page with the specified object.
+If the object already has a URL with a string value (presumably
+the address of an in-line image, like a GIF format file), it assumes
+you wish that image to serve as the hyperlink to <URL>.
+  If the URL is a list (an HTML document), it warns you and asks if
+you want to clear it and enter some text to serve as the hyperlink.
+If no URL is set on the object, it asks for the text you wish to
+serve as a hyperlink to <URL>.
+  This command actually constructs a small HTML document (generally
+one or two lines) and attaches it to the object.  It uses the
+information already associated with the object as described above to
+determine what sort of HTML document to construct.
+
+Related commands:
+@url -- set or read the associated URL
+@html -- set or read the associated HTML document
+
+.
+"The following LIST of STR value may be too long to set as one value.  It needs to be added using @set-note-text.";
+@prop $help."@vrmledit" {} rc BioGate_wizard
+@set-note-text $help.@vrmledit
+Syntax: @vrmledit <object>
+
+Moves you into the note editor and loads the VRML description text
+for the <object>.  Note that rooms have both exterior and interior
+VRMl descriptions. If you are standing in a room and use "@vrmledit
+here" then you'll be editing its interior description. Otherwise,
+you'll be editing its exterior one.
+.
+"The following LIST of STR value may be too long to set as one value.  It needs to be added using @set-note-text.";
+@prop $help."@scale-vrml" {} rc BioGate_wizard
+@set-note-text $help.@scale-vrml
+Syntax: @scale-vrml <object> with <scaling specification>
+        @scalevrml <object> with <scaling specification>
+        @scale <object> with <scaling specification>
+        @scale <object> with
+        @scale <object> with 0
+
+  Shrinks or grows the object's VRML representation according to the
+scaling specification.  The cases of omitting the specification or
+specifying zero have special meanings.  Omitting the scaling
+specifications returns the current scaling. Specifying a scaling of
+zero resets the scaling to 1.0:1.0:1.0 (ie. the unmodified object
+size).
+  Scaling specifications may be a single value, in which case a
+uniform scaling is implied (applied across the X, Y, and Z-axes).
+For instance, "@scale dog is 200%" means increase the dog's size
+two-fold.  Two other ways of performing the same action with slightly
+different commands are "@scale dog is 2x" and "@scale dog is 2" where
+the latter implies "fold-scaling" and not percentage.
+  IMPORTANT! The scaling you specify is applied on top of the
+current scaling setting. If the X-axis setting was already 2.0 and
+you specify another 2.0 scaling, the result is a 4.0 X-axis scaling
+value.
+  If you specify more than one number (either comma or space
+delimited), they are applied as first X, then Y, then Z-axis
+scalings. Omitting a value implies a scaling of 1 (ie. unchanged).
+Using "@scale dog 2, ,4" is the same as "@scale dog 2,1,4" for
+instance.
+.
+"The following LIST of STR value may be too long to set as one value.  It needs to be added using @set-note-text.";
+@prop $help."@webpass" {} rc BioGate_wizard
+@set-note-text $help.@webpass
+Syntax: @weblink <object> to <URL>
+
+  Used to associate an outside web page with the specified object.
+If the object already has a URL with a string value (presumably
+the address of an in-line image, like a GIF format file), it assumes
+you wish that image to serve as the hyperlink to <URL>.
+  If the URL is a list (an HTML document), it warns you and asks if
+you want to clear it and enter some text to serve as the hyperlink.
+If no URL is set on the object, it asks for the text you wish to
+serve as a hyperlink to <URL>.
+  This command actually constructs a small HTML document (generally
+one or two lines) and attaches it to the object.  It uses the
+information already associated with the object as described above to
+determine what sort of HTML document to construct.
+
+Related commands:
+@url -- set or read the associated URL
+@html -- set or read the associated HTML document
+.
+"The following LIST of STR value may be too long to set as one value.  It needs to be added using @set-note-text.";
+@prop $help."VRML" {} r BioGate_owner
+@set-note-text $help.VRML
+You can generally switch from web view to VRML view by selecting the "View VRML" link in the web viewer's button bar.  You can get back to the web view by either selecting the "web" icon you'll see in the VRML view, or by selecting an object in the room.  
+
+The VRML/1.0 system has a small number of commands that allow you to
+    1. assign a VRML description to any MOO object
+    2. move and turn MOO objects in space
+
+@vrml  -- list the VRML description lines associated with an object
+@vrmledit -- edit the VRML description on an object
+slide -- slide an object north, south, up, etc.
+twist -- twist an object clockwise (cw) or counterclockwise (ccw)
+tilt -- tilt an object toward a compass direction (tip it)
+@scale-vrml -- shrink or grow an object
+@set-vrml -- change optional VRML settings on an object
+web -- about the MOO's other web-based features
+.
+"The following LIST of STR value may be too long to set as one value.  It needs to be added using @set-note-text.";
+@prop $help."@web-options" {} r BioGate_owner
+@set-note-text $help.@web-options
+Syntax: @web-options
+        @weboptions
+        @weboption +<option>
+        @weboption -<option>
+        @weboption <option>=<value>
+
+See current web option settings with @weboptions or @web-options.
+Set various web options on or off with the +/- forms or set a value
+(where appropriate) with the "=" form.  The latter set is marked
+below with (=).
+
+Options:
+
+inv - show whon the web page what you're carrying
+map - show the campus map on the page
+hideicons - you don't want to see object's icons
+hidebanner - you don't want to see the MOO's banner on every page
+exitdetails - you want to see what room each exit leads to
+markURL - add a star next to the name of object that have some novel
+    URL set
+commandform - include a command form with fields for "say," @go, and
+    others
+nogo - don't include a section for @go in the command form
+nopage - don't include a section for paging in the command form
+viewer - set the object number of the viewer you wish to be your
+    default (=)
+background - set the background graphic for all your web pages (=)
+bgcolor - set the background color for all your web pages (=)
+nobackgrounds - you don't want you rweb page to have any background
+    set
+textcolor - set the color of your web page text (=)
+linkcolor - set the color of your web page's link text (=)
+vlinkcolor - set the color of your web page's visited link text (=)
+alinkcolor - set the color of your web page's active link text (=)
+applinkdown - put the link to the web applications list at the page
+    bottom
+ghosts - you want to notice when web ghosts inter the room
+use_ip - all links to the MOO on your web page should be i.p. numbers
+tight_link - require that both web and telnet/client links be from
+    the same machine
+nosay - you don't want a "say" field on your command form
+embedVRML - embed a VRML box in your web viewer page
+.
+"The following LIST of STR value may be too long to set as one value.  It needs to be added using @set-note-text.";
+@prop $help."@set-vrml" {} rc BioGate_wizard
+@set-note-text $help.@set-vrml
+Syntax: @set-vrml <setting name> on <object>
+
+  Allows you to set or read various settings associated with the VRML
+properties of an object.  These may be MOO-wide properties or ones
+specifically associated with a particular class of object.
+  If you omit the <setting name> you'll be presented with a list of
+all the VRML settings on the object and their current values.  If you
+specify a VRML setting by name you'll be prompted for the new value
+of that setting.
+  To change the value of a VRML setting, just repeat the command and
+enter the new value when prompted. To remove a setting from the list
+associated with the object, just enter an empty line for the value
+and you'll be asked if you want to clear it (say yes).
+
+lights
+  The text for the room's lights, normally retrieved from
+$vrml_utils.std_roomlights, can be overridden with this web setting.
+This is only valid for a room.
+
+linkzone
+  The place where various link objects that go in every room should
+appear (ie. the "link to web" object) can be overridden with this
+VRML setting.  The $vrml_utils.std_linkzone property has the default
+value.  This is only valid for a room.
+.
+"The following LIST of STR value may be too long to set as one value.  It needs to be added using @set-note-text.";
+@prop $help."slide" {} rc BioGate_wizard
+@set-note-text $help.slide
+Syntax:
+  slide <object> <direction> <distance> <units>
+  twist <object> clockwise|counterclockwise <angle> <units>
+  tilt <object> north|south... <angle> <units>
+
+Examples: slide table north 2 meters
+          tilt candle south 45 degrees
+          twist stove clockwise 90 degrees
+
+Directions may be abbreviated:
+    n, s, e, w, se, sw, ne, nw, d, u, cw, ccw
+Angle and distance must be integer numbers (to be upgraded in a
+future release so that non-integers are allowed also).
+Distance units may be any of:
+    mm, cm, m, km, in, ft, yd
+Angle units may be any of: degree or radian
+
+  Use these commands to move MOO objects though space within a room.
+"Slide" objects to translate then up, down, or toward any compass
+point.  "Twist" objects to rotate them around the Y-axis, either
+clockwise or counterclockwise.  "Tilt" object to tip their tops
+toward the direction you indicate.  Tilting north eans rotating an
+object in a positive direction around the X-axis.  Note that by MOO
+convention, the north is the negative Z-axis (the ones most browsers
+will have you facing when you enter a new room) and east is the
+positive X-axis.  The Y-axis points up.
+.
+@prop $help."twist" {"*forward*", "slide"} rc BioGate_wizard
+@prop $help."tilt" {"*forward*", "slide"} rc BioGate_wizard
+@prop $help."@vrml" {"*forward*", "@url"} rc BioGate_wizard
+ 
+@verb $help:"html" this none this rxd BioGate_wizard
+@program $help:html
+"Uses 'search' or 'rest' to determine which help topic was requested";
+"If none requested, returns the text for 'summary'.";
+"If the request is an ambiguous match or if the requested topic has";
+"'-index' in it, returns the results in 'index' format (columnized).";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+who = args[1];
+rest = args[2];
+search = args[3];
+topic = search || rest || "summary";
+help = $code_utils:help_db_search(topic, dblist = $code_utils:help_db_list());
+text2 = {};
+if (!help)
+  text = {"Sorry, but there is no help on \"" + topic + "\"."};
+  help = {"", topic};
+elseif (help[1] == $ambiguous_match)
+  text = {"Sorry, but that matches more than one possible help topic:<BR>"};
+  su = $string_utils;
+  title = "Possible Matches";
+  text = {@text, "<BR><B>" + title + "</B>", this:web_index(this:columnize(@this:sort_topics(help[2])))};
+  help = {"", topic};
+else
+  dblist = dblist[1 + (help[1] in dblist)..length(dblist)];
+  text = help[1]:get_topic(help[2], dblist);
+  if (typeof(text) != LIST)
+    text = {"<H3>Sorry!</H3> The help display seems to be broken."};
+  elseif (index(topic, "-index"))
+    text = this:web_index(text);
+  else
+    text = $web_utils:plaintext_to_html(text);
+    for line in (text)
+      seconds_left() < 2 || ticks_left() < 4000 ? $command_utils:suspend_if_needed(1) | 0;
+      if (index(line, "Syntax: "))
+        text2 = {@text2, "<B>Syntax:</B><BR>"};
+        line = line[9..length(line)];
+      endif
+      if (mtch = $string_utils:match_string(line, "* -- *"))
+        link = "<A HREF=\"&LOCAL_LINK;/" + $web_utils:get_webcode() + "/" + tostr(tonum(this)) + "/" + strsub(mtch[1], " ", "") + "#focus\">" + mtch[1] + "</A>";
+        text2 = {@text2, link + " -- " + mtch[2]};
+      else
+        text2 = {@text2, line};
+      endif
+    endfor
+  endif
+endif
+if (topic == "summary" && $web_utils.web_helppage)
+  text2 = {@text2 || text, tostr("<P>A <A HREF=\"", $web_utils.web_helppage, "\">condensed summary of commonly used commands</A> is available.")};
+endif
+return {"<P><B>Help on: " + help[2] + "</B><P>", @text2 || text, "<ISINDEX PROMPT=\"You can search the help index by entering a term here  \">"};
+"Last modified Sun Aug 25 21:35:22 1996 IDT by EricM (#3264).";
+.
+ 
+@verb $help:"web_index" this none this rxd BioGate_wizard
+@program $help:web_index
+"web_index( text in 'index' form LIST) -> HTML doc LIST";
+"Takes a list of strings in the format generated by";
+"$generic_help:index and converts it into hyperlinked HTML doc form.";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+link1 = "<A HREF=\"&LOCAL_LINK;/" + $web_utils:get_webcode() + "/" + tostr(tonum(this)) + "/";
+link2 = "#focus\">";
+link3 = "</A>";
+len = length(text = typeof(args[1]) == STR ? {args[1]} | args[1]);
+for line in [1..len]
+  seconds_left() < 2 || ticks_left() < 4000 ? suspend(1) | 0;
+  if (text[line] && text[line][1] != "-" && (line == len || (!text[line + 1] || text[line + 1][1] != "-")))
+    commands = $string_utils:explode(text[line]);
+    subline = "";
+    comlen = length(commands);
+    for command in [1..comlen]
+      filler = command < comlen && (l = length(commands[command])) < 20 ? $string_utils:space(20 - l, ".") | "";
+      subline = subline + link1 + commands[command] + link2 + commands[command] + link3 + filler;
+    endfor
+    text[line] = subline;
+  endif
+endfor
+return {"<PRE>", @text, "</PRE>"};
+"Last modified Thu Nov  2 09:00:58 1995 IST by EricM (#3264).";
+.

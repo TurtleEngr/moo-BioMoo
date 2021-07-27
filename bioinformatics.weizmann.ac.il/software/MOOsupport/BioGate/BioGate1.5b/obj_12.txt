@@ -1,0 +1,270 @@
+"Compiled Login Commands (#12) at Fri Jul 18 21:29:41 1997 IDT";
+"  If your MOO's main telnet entry port will never be used for HTTP";
+"connections, you can skip some of the changes to $login.  If only";
+"non-telnet ports will be used, you need only modify the";
+"$login:parse_command to use $login verbs of type "any none this" (as";
+"described below), install the :preapproved and :accept_preapproval";
+"verbs, and the .preapproved property, which are all required by the";
+"java telnet applet system.  If you want your $network.port also used";
+"as an HTTP port, continue with the instructions below.  It is";
+"recommended that you DON'T use your main telnet port as an HTTP port,";
+"but establish a separate port to handle those transactions.";
+"";
+"  To allow your MOO to function as an HTTP/1.0 server for connections";
+"to the telnet port, you need to make the welcome text into valid";
+"HTML/1.0 comment lines, as well as include an HTTP/1.0 opening header";
+"line.  To do this, add the "merge_welcome_line" verb to $login, and";
+"replace the MOO's $login:help with the "help_http1.0" verb given";
+"below.  Don't name it "help_http1.0" but just use the below labeled";
+"verb as the source of new code for $login:help.  These two verbs will";
+"transform your $login.welcome_message text into proper HTML/1.0";
+"header line syntax when they are displayed.";
+"  The simplest way to allow HTTP calls to your standard telnet/client";
+"port is to add the verb given below as "GET POST" with args "any none";
+"any" to $login.  However, this will cause GET to appear as a";
+"legitimate login command during user connection, possibly confusing";
+"users.  A nice solution is to add the "GET POST" verb with args "any";
+"none this" (as shown below), and to slightly modify";
+"$login:parse_command as noted in the example below, so that "any none";
+"this" verbs don't appear as user options, but the $login:GET command";
+"is still available as a legitimate command.  This still allows the";
+"usual "any none any" verbs (like "connect") to function as before.";
+"  Note that $login:check_for_shutdown has also been modified to make";
+"it complient with HTTP/1.0 calls (turned into an extended HTML header";
+"comment line).";
+"  IF YOUR $LOGIN:PARSE_COMMAND AND $LOGIN:CHECK_FOR_SHUTDOWN ARE NOT";
+"LAMBDACORE STANDARD, DON'T JUST PASTE IN THE VERB OF THAT NAME FROM";
+"THIS FILE, OR YOU'LL LOSE YOUR CHANGES.";
+
+@prop $login."welcome_message" "<!-- Your MOO's telnet/client splash screen goes here.  Notice that the text must be have \"<!--\" at the start and \"-->\" at the end if your telnet port is to be for HTTP/0.9." rc BioGate_wizard
+@prop $login."preapproved" {} "" BioGate_owner
+ 
+@verb $login:"GET POST" any none this rx BioGate_wizard
+@program $login:GET
+"Handle HTTP calls of method GET or POST to the MOO's main";
+"telnet/client port.  Note that the args are 'any none this' (and";
+"$login:parse_command has been slightly altered from standard";
+"LambdaCore), to prevent GET and POST from appearing as valid user";
+"connection commands.";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+protocol = "0.9";
+if (caller != #0)
+  return E_PERM;
+elseif (stuff = match(argstr, "^%(GET%|POST%) /%([^ ]*%)%( HTTP/%(.*%)%)?"))
+  "This is an HTTP call. Pass it to the $http_handler";
+  "hide the argstr from later verbs";
+  argstr = "";
+  method = substitute("%1", stuff);
+  uri = substitute("%2", stuff);
+  protocol = substitute("%4", stuff) || "0.9";
+  "call $http_handler:web_handle(method STR, request-URI STR, HTTP-version STR)";
+  if (method == "GET" && ($http_handler.login_is_http09 || protocol[1] == "0"))
+    "HTTP/0.9 can only handle method GET transactions.";
+    handler = "handle_http09";
+  elseif (protocol[1] == "1")
+    handler = "handle_http10";
+  else
+    "this is a non-standard call, but send it to $http_handler:handle_http10 and hope for the best";
+    handler = "handle_http10";
+  endif
+  return $http_handler:(handler)(player, method, uri, protocol);
+else
+  "This could be from many sources - confused user, runaway FTP command...";
+  return this:("?")();
+endif
+"Last modified Sun Aug 25 16:09:15 1996 IDT by Gustavo (#2).";
+.
+ 
+@verb $login:"parse_command" this none this rx BioGate_wizard
+@program $login:parse_command
+":parse_command(@args) => {verb, args}";
+"Given the args from #0:do_login_command,";
+"  returns the actual $login verb to call and the args to use.";
+"Commands available to not-logged-in users should be located on this object and given the verb_args \"any none any\"";
+if (caller != #0)
+  return E_PERM;
+endif
+if (!args)
+  return {this.blank_command, @args};
+  "commented out LambdaCore line, so 'GET POST' won't show as a user command";
+  "elseif ((verb = args[1]) && (verb_args(this, verb) == {\"any\", \"none\", \"any\"} && index(verb_info(this, verb)[2], \"x\")))";
+elseif ((verb = args[1]) && (verb_args(this, verb)[1..2] == {"any", "none"} && index(verb_info(this, verb)[2], "x")))
+  return args;
+else
+  return {this.bogus_command, @args};
+endif
+"Last modified Fri Aug 16 07:59:08 1996 IDT by EricM (#3264).";
+.
+ 
+@verb $login:"help_http1.0" any none this rx BioGate_wizard
+@program $login:help_http1.0
+"This the the version of $login:help to use when using the MOO's telnet port as an HTTP/1.0 server";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+if (caller != #0)
+  return E_PERM;
+else
+  msg = this.welcome_message;
+  version = server_version();
+  if (typeof(msg) != LIST)
+    msg = {tostr(msg)};
+  endif
+  if (!$http_handler.login_is_http09)
+    msg[1] = this:merge_welcome_line("HTTP/1.0 200 ", msg[1]);
+    if (length(msg) > 1)
+      msg[2] = this:merge_welcome_line("X-moo: ", msg[2]);
+      for i in [3..length(msg)]
+        if (!msg[i])
+          msg[i] = " .";
+          "elseif (msg[i][1] != \" \")";
+          "msg[i] = \" \" + msg[i];";
+        else
+          msg[i] = " " + msg[i];
+        endif
+      endfor
+    endif
+  endif
+  for line in (msg)
+    if (typeof(line) == STR)
+      notify(player, strsub(line, "%v", version));
+    endif
+  endfor
+  this:check_player_db();
+  this:check_for_shutdown();
+  return 0;
+endif
+"Last modified Wed Dec 25 20:35:03 1996 IST by EricM (#3264).";
+.
+ 
+@verb $login:"merge_welcome_line" this none this rx BioGate_owner
+@program $login:merge_welcome_line
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+l1 = length(args[1]);
+l2 = length(args[2]);
+return tostr(args[1], $string_utils:triml(args[2][1..min(l1, l2)]), args[2][l1 + 1..l2]);
+"Last modified Thu Mar  7 06:55:08 1996 IST by EricM (#3264).";
+.
+ 
+@verb $login:"preapproved" any none this rxd BioGate_wizard
+@program $login:preapproved
+"Usage:  preapproved user pword";
+"preapproved(user STR, pword STR) -> 0 or user OBJ";
+"give OK to users with preapproved passwords";
+"This allows a JavaClient to automatically connect a user.";
+"NOTE: All text output from this verb to the user should contain a certain common text string (such as '***', for example).  This allows clients to be set up to search for this text string and not display MOO output until they get it (but if this verb outputs messages without the required text, the clients will appear to just hang instead, and the user will never actually see the message).";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+if (caller != #0)
+  return E_PERM;
+endif
+{?candidate = "", ?pword = ""} = args;
+you_lose_msg = "*** Either that character does not exist, or has a different password. ***";
+timeout = 180;
+"timeout <- how much time user has to connect before preapproval expires";
+who = #-1;
+port_handler = $network.port;
+options = {};
+if (typeof(this.preapproved) != LIST)
+  "fix damaged record list";
+  this.preapproved = {};
+  notify(player, "*** Sorry, the authentication system failed.  Please try again. ***");
+  boot_player(player);
+  return 0;
+elseif (candidate == "guest")
+  "guests fly free";
+  who = $string_utils:match_player("guest");
+  if (!valid(who = `who:defer_login(candidate) ! E_VERBNF => who:defer(candidate)'))
+    notify(player, "*** Too many guests! ***");
+    notify(player, "Sorry!  All our guest characters are in use now.  Please try again later.");
+    boot_player(player);
+    return 0;
+  endif
+  if (record = $list_utils:assoc(pword, this.preapproved))
+    port_handler = record[5];
+    options = record[4];
+    this.preapproved = setremove(this.preapproved, record);
+  else
+    "corrupt or otherwise messed up preapproval record";
+    boot_player(player);
+    return 0;
+  endif
+elseif ((record = $list_utils:assoc(pword, this.preapproved)) && ($string_utils:match_player(candidate) == record[2] || candidate == record[2].name))
+  if (record[3] + timeout < time())
+    "preapproval has timed out";
+    boot_player(player);
+    return 0;
+  endif
+  who = record[2];
+  options = record[4];
+  port_handler = record[5];
+  this.preapproved = setremove(this.preapproved, record);
+else
+  notify(player, "*** Bad temporary password generated; please notify an administrator. ***");
+  boot_player(player);
+  return 0;
+endif
+if (typeof(who) != OBJ || !valid(who) || `who.account_lockout ! E_PROPNF' || `who in this.newts ! E_PROPNF' || `who in this.temporary_newts ! E_PROPNF')
+  "note that some MOO's may not use any of the lockout methods tested for here and will need customization of the test";
+  notify(player, you_lose_msg);
+  boot_player(player);
+  return 0;
+endif
+if ((approved = this.preapproved) && !(approved[idx = random(length(approved))][3] + timeout > time()))
+  "Remove expired or misformed approvals";
+  "Note another way to do this is with a fork, but forks lag MOOs";
+  this.preapproved = listdelete(this.preapproved, idx);
+  if ((approved = this.preapproved) && !(approved[idx = random(length(approved))][3] + timeout > time()))
+    "try to kill another";
+    this.preapproved = listdelete(this.preapproved, idx);
+  endif
+endif
+if (valid(who))
+  fork (0)
+    $http_handler:user_autoconnected(who, port_handler, options);
+  endfork
+  notify(player, "*** Autoconnecting ... ***");
+  this:record_connection(who);
+endif
+return who;
+"Last modified Tue Jul  1 22:17:15 1997 IDT by EricM (#3264).";
+.
+ 
+@verb $login:"accept_preapproval" this none this rx BioGate_owner
+@program $login:accept_preapproval
+"accept_preapproval(user OBJ[, options LIST]) -> pword STR";
+"issue the user a temporary pword for preapproved log-in";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+if (!caller_perms().wizard)
+  return E_PERM;
+endif
+{user, ?options = {}} = args;
+pword = $string_utils.alphabet[random(26)] + tostr(90000000 + random(900000000));
+port_handler = `valid(port_handler = $http_handler:retrieve_taskprop("port_handler")) ! E_TYPE' ? port_handler | $login;
+this.preapproved = {@this.preapproved, {pword, user, time(), options, port_handler}};
+return pword;
+"Last modified Tue Jul  1 20:07:06 1997 IDT by EricM (#3264).";
+.
+ 
+@verb $login:"check_for_shutdown" this none this rxd BioGate_wizard
+@program $login:check_for_shutdown
+"This has been modified to be HTTP/1.0 complient when inserted into the header lines";
+when = $shutdown_time - time();
+if (when >= 0)
+  line = " ***************************************************************************";
+  shortline = " ****";
+  blankspace = " .";
+  notify(player, blankspace);
+  notify(player, blankspace);
+  notify(player, line);
+  notify(player, line);
+  notify(player, shortline);
+  notify(player, tostr(shortline, "  WARNING:  The server will be shut down in ", $time_utils:english_time(when - when % 60), "."));
+  for piece in ($generic_editor:fill_string($shutdown_message, 60))
+    notify(player, shortline + "            " + piece);
+  endfor
+  notify(player, shortline);
+  notify(player, line);
+  notify(player, line);
+  notify(player, blankspace);
+  notify(player, blankspace);
+endif
+"Last modified Thu Aug 15 19:36:13 1996 IDT by EricM (#3264).";
+.

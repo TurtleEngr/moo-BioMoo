@@ -1,0 +1,97 @@
+"Compiled generic exit (#7) at Fri Jul 18 21:29:13 1997 IDT";
+"If your MOO has $exit.leave_msg not set, then user's won't see";
+"confirmation of their web-initiated movement via exits confirmed in";
+"the telnet window  If you wish to change this, you could set";
+"$exit.leave_msg to something like:  You move %t.";
+
+"The following property should already be defined on the object, with perms 'rc' and owner BioGate_wizard";
+@set $exit.vrml_desc to {"Translation { translation 0 -.25 0 }", "Material { diffuseColor 0 0 1 } Cube {width 1.2 height 2.0 depth 0.05 } #frame", "Texture2 {filename \"http://www.cco.caltech.edu/~mercer/images/bkgds/maple.bmp\" }", "Transform { translation 0 -0.07 0 } Material {diffuseColor 0 0 0 shininess 0}", "Cube {width 1 height 1.9 depth 0.1} # door opening"}
+ 
+@verb $exit:"html" this none this rx BioGate_wizard
+@program $exit:html
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+set_task_perms(caller_perms());
+this:move(player);
+return $nothing;
+"Last modified Mon Nov  6 01:57:49 1995 IST by EricM (#3264).";
+.
+ 
+@verb $exit:"has_url" this none this rx BioGate_wizard
+@program $exit:has_url
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+return 1;
+"Last modified Wed Aug 17 15:51:08 1994 IDT by Gustavo (#2).";
+.
+ 
+@verb $exit:"get_vrml_desc" this none this rxd BioGate_owner
+@program $exit:get_vrml_desc
+"get_vrml_desc(none) -> VRML frg LIST";
+"Exits get linked to new room, and non-obvious exits are transparent";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+vrml_desc = pass(@args);
+if (!this.obvious)
+  "A colorless transparent 1 meter square panel with center origin; Scale sets the true size";
+  vrml_desc = {"Material { diffuseColor 1 1 1 shininess 0 transparency 1 } Cube { width 1 height 1 depth 0.1}"};
+endif
+return vrml_desc;
+"Last modified Mon Apr  1 10:06:47 1996 IDT by EricM (#3264).";
+.
+ 
+@verb $exit:"get_vrml_translation get_vrml_rotation" this none this rxd BioGate_wizard
+@program $exit:get_vrml_translation
+"get_vrml_translation get_vrml_rotation(none) -> VRML frg LIST";
+"If settings are default, apply a reasonable method to place the exit in the right general direction.";
+"Assumes that the Z-axis points north";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+exits = $object_utils:isa(this.source, $room) ? this.source:exits() | {};
+set_task_perms($perm_utils:controls(cp = caller_perms(), this) || caller in {this, $std_vrml10viewer} ? this.owner | cp);
+abbrev_dirs = {"n", "ne", "e", "se", "s", "sw", "w", "nw"};
+dirs = {"north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"};
+if ((vrml_desc = pass(@args)) != {0, 0, 0})
+  return vrml_desc;
+  "User or previous call has set it";
+endif
+if (idx = this.name in abbrev_dirs || this.name in dirs)
+  "twist so it faces in the direction it leads";
+else
+  "they didn't use a direction name, so they get a randomly facing exit";
+  exits = $list_utils:map_prop(exits, "name");
+  idx = length(dirs);
+  while (idx > 0 && !(dirs[idx] in exits || abbrev_dirs[idx] in exits))
+    idx = idx - 1;
+  endwhile
+  "if couldn't assign it, pick one randomly; note it's rot'n will probably be non-standard for that direction, so it'll be visible over the correct exit there";
+  idx = idx ? idx | random(length(dirs));
+endif
+if (verb[10..14] == "rotat")
+  "--Rotate exit";
+  rotn = (idx = idx - 1) ? 62832 - idx * 785 | 0;
+  return this:set_vrml_rotation({0, rotn, 0});
+endif
+"Translate the exit so it's not too close to the center of the room";
+transl_table = {{0, 0, -5000}, {4000, 0, -4000}, {5000, 0, 0}, {4000, 0, 4000}, {0, 0, 5000}, {-4000, 0, 4000}, {-5000, 0, 0}, {-4000, 0, -4000}};
+return this:set_vrml_translation(transl_table[idx]);
+"Last modified Wed Apr 10 06:56:56 1996 IDT by EricM (#3264).";
+.
+ 
+@verb $exit:"get_vrml_hyperlink" this none this rxd BioGate_owner
+@program $exit:get_vrml_hyperlink
+"get_vrml_hyperlink(none) -> VRML frg LIST";
+"Exits have hyperlinks leading to their destination room";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+if (valid(dest = this.dest) && $object_utils:isa(dest, $room) && dest:is_unlocked_for(player))
+  if (!("embedVRML" in player.web_options))
+    "person is seeing this with a VRML browser and not within a web window";
+    link = {tostr(" WWWAnchor {description \"", this.name, " to ", this.dest.name, "\" name \"&LOCAL_LINK;/", $web_utils:get_webcode(), "/", tonum(this.dest), "/moveto/room.wrl\" ")};
+    "also, move them to the new room if possible and appropriate";
+  else
+    "person's seeing this in a web window; show them another web window";
+    code = typeof(viewer = $web_options:get(player.web_options, "viewer")) == OBJ ? viewer:get_code() | $standard_webviewer:get_code();
+    link = {tostr(" WWWAnchor {description \"", this.name, ", to ", this.dest.name, "\" name \"&LOCAL_LINK;/", code, "/", tonum(this), "#focus\" ")};
+  endif
+else
+  link = pass(@args);
+endif
+return link;
+"Last modified Thu Aug 15 02:45:48 1996 IDT by EricM (#3264).";
+.

@@ -1,0 +1,33 @@
+****  THE BIOGATE SYSTEM - A WEB-MOO INTERFACE PACKAGE  ****
+
+August 1997. BioGate Partners is pleased to announce the public release of its BioGate System, a package of MOO objects and MOO language code enabling any existing LambdaCore-based MOO to function as a World Wide Web server.  After installation of the BioGate System, a MOO will:
+
+--  present a simplified user interface, taking advantage of the
+    intuitive and familiar Web page format
+--  allow users to associate online multimedia resources with MOO
+    objects
+--  construct integrated web pages displaying a compete, up-to-the-
+    moment, multimedia 2D view of MOO rooms and objects
+--  present other information about the MOO and what's in it through web
+    pages
+--  allow users to view and navigate the MOO through dynamically
+    generated VRML/1.0 scenes
+--  present an integrated web-plus-telnet interface using an embedded
+    Java telnet applet
+--  provide an "anonymous browsing" interface for Web users who are not
+    also connected to the MOO by telnet
+--  function like a "cgi-bin", accepting, processing, and responding to
+    submitted information through the HTTP/1.0 protocol
+
+The BioGate System comes with an extensive set of user help and system design documentation texts, all implemented as in-MOO help database entries.  Additional in-code documentation includes detailed header lines and internal comments.  The BioGate System package is constructed as a set of scripts that may be pasted into the MOO using a typical MUD/MOO client program.
+
+The BioGate System was developed at BioMOO and Diversity University Main Campus, two academic MOOs devoted to educational and professional academic usage.  The BioGate System has also been tested at more than ten other MOOs, private and public, whose input has helped improve the installation procedures and functioning of the system.  The BioGate System provides Web support for the eduCore, a MOO core distributed by Diversity University.
+
+The BioGate System package is available free for noncommercial use under the Noncommercial Usage License included in the package, and may be found online at:
+    ftp://bioinfo.weizmann.ac.il/pub/software/MOOsupport/BioGate/
+Commercial use of the BioGate System is allowed only under the Commercial Usage License, which requires a U.S.$1000 fee per installation, as described in the license.  Both the Noncommercial and Commercial Licenses are included with the BioGate System package.
+
+BioGate Partners is a group of people associated with BioMOO and Diversity University Main Campus, who developed and implemented the BioGate System to further the use of MOOs as educational and professional academic environments.
+
+BioMOO <http://bioinformatics.weizmann.ac.il/BioMOO/> is an online meeting place for Biology professionals, sponsored by the Weizmann Institute of Science.  Diversity University Main Campus is an online campus sponsored by Diversity University <http://www.du.org/>, for teachers, learners, and others interested in promoting online education through multi-user VR worlds.
+

@@ -1,0 +1,38 @@
+"Compiled generic sign (#1438) at Fri Jul 18 21:29:23 1997 IDT";
+"Generic sign; an object that you can 'read' and 'look' at to see the same thing.";
+
+ 
+@verb $sign:"get_icon" this none this rx BioGate_wizard
+@program $sign:get_icon
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+return this.icon;
+"Last modified Wed Dec 14 18:36:45 1994 IST by Gustavo (#2).";
+.
+ 
+@verb $sign:"verbs_for_web" this none this rxd BioGate_owner
+@program $sign:verbs_for_web
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+return {};
+"Last modified Fri Dec 16 09:52:30 1994 IST by EricM (#3264).";
+.
+ 
+@verb $sign:"html" this none this rx BioGate_wizard
+@program $sign:html
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+who = args[1];
+rest = args[2];
+search = args[3];
+set_task_perms(caller_perms().wizard ? who | caller_perms());
+if (!rest && !search)
+  if (typeof(url = this:url() || {}) == STR)
+    url = $web_utils:build_MIME(url);
+  endif
+  text = this:text();
+  if (this.content_type == "TEXT/PLAIN")
+    text = $web_utils:preformat($web_utils:html_entity_sub(text));
+  endif
+  return {@url, @text, @this:more_info_for_web(@args), @this:verbs_for_web(@args)};
+endif
+return pass(@args);
+"Last modified Fri May 10 15:27:03 1996 IDT by EricM (#3264).";
+.

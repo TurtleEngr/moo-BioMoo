@@ -1,0 +1,186 @@
+"Compiled System Object (#0) at Fri Jul 18 21:29:58 1997 IDT";
+"*********    ***********    ***********";
+"IMPORTANT!!!!!!  Do NOT just paste the following verbs into your MOO.";
+"The only parts you need are marked off by "--- used by MCP-aware";
+"telnet clients ----" at the start and " ---- " at the end.  The";
+"entire verb is given only to provide context for determining where in";
+"your MOO's verb to add the needed section.  Header text given before";
+"each verb below will help you determine where in the verb the new";
+"section needs to be added.";
+
+ 
+"IMPORTANT!!! Don't paste this verb directly into your MOO.  You only";
+"need a portion of it.  The section needed for the integrated web";
+"interface is marked off below, with "---" comments.  It should be";
+"inserted just before the `args = login:parse_command(@args);' line in";
+"your MOO.  Only the area around that portion of the verb is given below.";
+ 
+"@verb #0:"do_login_command" this none this rxd BioGate_wizard
+"";
+"...";
+"";
+endif
+" --- used by MCP-aware telnet clients ---- ";
+if ($mcp:is_reading(player) == 1 && $mcp:process_reading_line(player, argstr))
+  return 0;
+endif
+" ---- ";
+args = login:parse_command(@args);
+who = login:(args[1])(@listdelete(args, 1));
+if (typeof(who) == OBJ && is_player(who) && !(who in connected_players()))
+  notify(player, "*** Connected ***");
+else
+  login:handle_bad_commands(@args);
+endif
+return who;
+"Last modified Wed Mar  5 10:27:52 1997 IST by Gustavo (#2).";
+.
+ 
+"IMPORTANT!!!  Don't just paste in the following verb, but only the";
+"section marked "--- used by MCP-aware telnet clients ---" and ended";
+"with the "---" line.  That section may be placed anywhere within the";
+"verb that will always be run when the verb is called.";
+ 
+@verb #0:"user_created user_connected" this none this rx BioGate_wizard
+@program #0:user_connected
+if (callers() && caller != $login)
+  return E_PERM;
+endif
+user = args[1];
+fork (0)
+  user.location:confunc(user);
+endfork
+ou = $object_utils;
+delay = 1;
+for watcher in ($login.watchers)
+  if (ou:has_verb(watcher, verb))
+    fork (delay)
+      watcher:(verb)(user);
+    endfork
+  endif
+  delay = delay + 1;
+endfor
+"--- used by MCP-aware telnet clients ----";
+$mcp:user_connected(user);
+"----";
+user:confunc();
+"Last modified Fri Oct  4 21:22:52 1996 IST by EricM (#3264).";
+.
+ 
+"IMPORTANT!!!  Don't just paste in the following verb, but only the";
+"section marked "--- used by MCP-aware telnet clients ---" and ended";
+"with the "---" line.  That section should be inserted immediately";
+"after the permissions test near the top of the verb.";
+"";
+"If the verb doesn't exist on your MOO, add it with:";
+"  @verb #0:do_command this none this rx #2";
+ 
+@verb #0:"do_command" this none this rx BioGate_wizard
+@program #0:do_command
+if (callers())
+  return E_PERM;
+endif
+"--- used by MCP-aware telnet clients ---";
+if ($mcp:is_reading(player) == 1 && $mcp:process_reading_line(player, argstr))
+  return 1;
+endif
+"---";
+if (!is_clear_property(player, "memory"))
+  totell = player.memory;
+  clear_property(player, "memory");
+  player:tell_lines(totell);
+endif
+if (del = player.delimiter_msg)
+  if (typeof(del) == STR)
+    notify(player, del);
+  endif
+endif
+return 0;
+"Last modified Fri Oct  4 20:58:51 1996 IST by EricM (#3264).";
+.
+ 
+"IMPORTANT!!!! Don't just paste in the following verb.  Many MOO's";
+"don't have it, in which case you should first";
+"";
+"@verb #0:do_out_of_band_command this none this rxd #2";
+"";
+"And then paste in the verb code below.  HOWEVER, if your MOO does";
+"have this verb, you will want to insert similar code such that";
+"$mcp:do_out_of_band_command is always called.  In the BioGate System";
+"code, this is done by calling that verb if the `player' in";
+"#0:do_out_of_band_command is not valid, and by calling it from";
+"$player:do_out_of_band_command if it is.  This allows some";
+"flexibility in the character object's handling of out of band";
+"commands.";
+"";
+ 
+@verb #0:"do_out_of_band_command" this none this rxd BioGate_wizard
+@program #0:do_out_of_band_command
+if (callers())
+  return E_PERM;
+endif
+if (valid(player))
+  player:do_out_of_band_command(@args);
+else
+  $mcp:do_out_of_band_command(@args);
+endif
+"Last modified Fri Oct  4 21:05:46 1996 IST by EricM (#3264).";
+.
+ 
+"IMPORTANT!!!!!!!  Do NOT just paste this following code into your";
+"MOO.  See the header text for the #0:user_connected installation for";
+"information. The same instructions apply to this verb.";
+ 
+@verb #0:"user_reconnected" this none this rx BioGate_wizard
+@program #0:user_reconnected
+if (callers())
+  return E_PERM;
+endif
+user = args[1];
+fork (0)
+  user.location:reconfunc(user);
+endfork
+ou = $object_utils;
+for watcher in ($login.watchers)
+  if (ou:has_verb(watcher, verb))
+    fork (1)
+      watcher:(verb)(user);
+    endfork
+  endif
+endfor
+"--- used by MCP-aware telnet clients ---";
+$mcp:user_connected(user);
+"---";
+user:reconfunc();
+"Last modified Fri Oct  4 21:22:07 1996 IST by EricM (#3264).";
+.
+"Last modified Fri Oct  4 21:05:46 1996 IST by EricM (#3264).";
+.
+ 
+"IMPORTANT!!!!!!!  Do NOT just paste this following code into your";
+"MOO.  See the header text for the #0:user_connected installation for";
+"information. The same instructions apply to this verb.";
+ 
+@verb #0:"user_reconnected" this none this rx BioGate_wizard
+@program #0:user_reconnected
+if (callers())
+  return E_PERM;
+endif
+user = args[1];
+fork (0)
+  user.location:reconfunc(user);
+endfork
+ou = $object_utils;
+for watcher in ($login.watchers)
+  if (ou:has_verb(watcher, verb))
+    fork (1)
+      watcher:(verb)(user);
+    endfork
+  endif
+endfor
+"--- used by MCP-aware telnet clients ---";
+$mcp:user_connected(user);
+"---";
+user:reconfunc();
+"Last modified Fri Oct  4 21:22:07 1996 IST by EricM (#3264).";
+.

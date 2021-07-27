@@ -1,0 +1,100 @@
+"Compiled string utilities (#20) at Fri Jul 18 21:29:42 1997 IDT";
+"  You can enable (nearly) full ascii character usage for your MOO's";
+"web system by setting the "full_ascii" and "ansi" properties which";
+"will be added to $string_utils as part or the package.  By default,";
+"they will be set to the empty string, and the web system will use the";
+"standard LambdaCore $string_utils.ascii instead.";
+"  If you have FUP installed on your MOO, you can set these properties";
+"with the lines:";
+"";
+"  ;$string_utils.full_ascii_data = fileread("<web_package_dir>",full_ascii.txt)[1]";
+"";
+"and";
+"";
+"  ;$string_utils.ansi = fileread("<web_package_dir>",ansi_data.txt)[1]";
+"";
+"where <web_package_dir> is the path leading to where the package";
+"files are kept.  It is necessary to set these properties this way";
+"because they include the carriage return character, which you can't";
+"normally include in a MOO value.  If you don't have FUP installed, it";
+"is recommended you just leave the .full_ascii and .ansi properties as";
+"empty strings since they are not critical to the web system's";
+"function.";
+"  Within the web system, only users with wizardly perms will have";
+"access to the $string_utils.full_ascii property, while others will";
+"have access to the $string_utils.ansi values instead.  Note that";
+"neither value will include the line feed character (ascii 10), since";
+"that's used by the MOO server, and it's presence would corrupt the";
+"database.";
+"";
+"  Make sure that your $string_utils:is_numeric verb has the";
+"additional alias of "is_integer" since with the advent of FLOAT";
+"values this is an important distinction.";
+"";
+"  The substitute_suspended verb is provided here, but is just a copy";
+"of $string_utils:substitute that can suspend.  It's provided as a";
+"separate verb since some MOOs have customized their";
+"$string_utils:substitute verb and won't want to over-write it.";
+"However, you can just modify your $string_utils:substitute with the";
+"alias substitute_suspended and have calls to the alias allowed to";
+"suspend.";
+
+@prop $string_utils."full_ascii" "" "" BioGate_wizard
+@prop $string_utils."ansi" "" r BioGate_wizard
+ 
+@verb $string_utils:"substitute_s*uspended" this none this rxd BioGate_wizard
+@program $string_utils:substitute_suspended
+"subst(string,{{redex1,repl1},{redex2,repl2},{redex3,repl3}...}[,case])";
+"Derived from the original $string_utils:subst, but can suspend";
+"note that some MOOs have made large variations of $string_utils:subst so this was created seperately rather than have people try to resolve them or risk overwriting";
+"  => returns string with all instances of the strings redex<n> replaced respectively by the strings repl<n>.  If the optional argument `case' is given and nonzero, the search for instances of redex<n> is case sensitive.";
+"  Substitutions are done in parallel, i.e., instances of redex<n> that appear in any of the replacement strings are ignored.  In the event that two redexes overlap, whichever is leftmost in `string' takes precedence.  For two redexes beginning at the same position, the longer one takes precedence.";
+"";
+"subst(\"hoahooaho\",{{\"ho\",\"XhooX\"},{\"hoo\",\"mama\"}}) => \"XhooXamamaaXhooX\"";
+"subst(\"Cc: banana\",{{\"a\",\"b\"},{\"b\",\"c\"},{\"c\",\"a\"}},1) => \"Ca: cbnbnb\"";
+if (typeof(ostr = args[1]) != STR)
+  return ostr;
+endif
+case = {@args, 0}[3];
+len = length(ostr);
+" - - - find the first instance of each substitution - -";
+indices = {};
+substs = {};
+for s in (args[2])
+  if (i = index(ostr, s[1], case))
+    fi = $list_utils:find_insert(indices, i = i - len) - 1;
+    while (fi && (indices[fi] == i && length(substs[fi][1]) < length(s[1])))
+      "...give preference to longer redexes...";
+      fi = fi - 1;
+    endwhile
+    indices = listappend(indices, i, fi);
+    substs = listappend(substs, s, fi);
+  endif
+  index(verb, "substitute_s") && (seconds_left() < 2 || ticks_left() < 4000) ? suspend(1) | 0;
+endfor
+"- - - - - perform substitutions - ";
+nstr = "";
+while (substs)
+  ind = len + indices[1];
+  sub = substs[1];
+  indices = listdelete(indices, 1);
+  substs = listdelete(substs, 1);
+  if (ind > 0)
+    nstr = nstr + ostr[1..ind - 1] + sub[2];
+    ostr = ostr[ind + length(sub[1])..len];
+    len = length(ostr);
+  endif
+  if (next = index(ostr, sub[1], case))
+    fi = $list_utils:find_insert(indices, next = next - len) - 1;
+    while (fi && (indices[fi] == next && length(substs[fi][1]) < length(sub[1])))
+      "...give preference to longer redexes...";
+      fi = fi - 1;
+    endwhile
+    indices = listappend(indices, next, fi);
+    substs = listappend(substs, sub, fi);
+  endif
+  index(verb, "substitute_s") && (seconds_left() < 2 || ticks_left() < 4000) ? suspend(1) | 0;
+endwhile
+return nstr + ostr;
+"Last modified Mon Jun 30 19:52:37 1997 IDT by EricM (#3264).";
+.

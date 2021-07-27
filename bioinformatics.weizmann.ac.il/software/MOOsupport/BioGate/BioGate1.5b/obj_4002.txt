@@ -1,0 +1,299 @@
+"Compiled general teleporter object (#4002) at Fri Jul 18 21:29:34 1997 IDT";
+"Also covers general user teleportation messages, not just for the";
+"web.  You'll have to set the "central room" property on this object";
+"to the object number of the room you wish to be on the button bar for";
+"the Standard Web Viewer as the "central" room of the MOO, if you want";
+"it to be anything other than the default ($player_start).";
+"  The default imagemap info for the MOO is also on this object. As";
+"with the rest of the BioGate package's mapping system, "image_map" is";
+"the URL for the map (eg. "http://where.edu/map.gif"), imagemap_rooms";
+"is the list of rooms (eg. {#11, #2323,...}), and imagemap_regions is";
+"the list of regions (in $web_utils:interpret_map format)";
+"corresponding to the rooms.  In order to generate a consistant feel";
+"in the MOO, the maps are expanded/contracted to fit the dimensions";
+"given in default_mapsize (as a width, height pair, eg. {100,50}).";
+"  The Standard Viewer's object number will be automatically added by";
+"the installation script to the list of $teleporter.trusted_callers,";
+"which is required for the "go" function on the Standard Viewer's";
+"command form to work properly.";
+
+"The following property should already be defined on the object, with perms 'rc' and owner BioGate_wizard";
+@set $teleporter.aliases to {"general teleporter object", "teleporter object", "genteleporter", "$teleporter"}
+"The following property should already be defined on the object, with perms 'rc' and owner BioGate_wizard";
+@set $teleporter.description to "You see nothing special.  Don't be deceived."
+"The following property should already be defined on the object, with perms 'r' and owner BioGate_wizard";
+@set $teleporter.web_calls to 0
+@prop $teleporter."trusted_callers" {} r BioGate_wizard
+@prop $teleporter."image_map" "" r BioGate_wizard
+@prop $teleporter."imagemap_regions" {} r BioGate_wizard
+@prop $teleporter."imagemap_rooms" {} r BioGate_wizard
+@prop $teleporter."central_room" #11 r BioGate_wizard
+@prop $teleporter."default_mapsize" {0, 0} r BioGate_wizard
+ 
+"Adding the Standard Viewer's object number to the list of $teleporter.trusted_callers ...";
+;$teleporter.trusted_callers=setadd($teleporter.trusted_callers,$standard_webviewer)
+"Done.";
+
+"Setting $teleporter.central_room to $player_start ...";
+;$teleporter.central_room = $player_start
+"Done.";
+
+@verb $teleporter:"teleport_user" this none this rx BioGate_wizard
+@program $teleporter:teleport_user
+"This is a general tool for teleporting users within the MOO. It requires:";
+"args[1] - person to be moved";
+"args[2] - place to move them to";
+"It can take as additional arguments:";
+"  args[3] - leave_succeeded_msg";
+"  args[4] - oleave_succeeded_msg";
+"  args[5] - leave_failed_msg";
+"  args[6] - oleave_failed_msg";
+"  args[7] - arrive_msg";
+"  args[8] - oarrive_msg";
+"If any of these optional arguments is empty, then the default is used.";
+"If it is '$' however, that message is not displayed.  The default for";
+"oleave_failed_msg and arrive_msg is no message displayed,";
+"but all the other messages have suitable texts assigned as defaults.";
+"  For purposes of the usual pronoun substitutions, 'thing' is the";
+"destination, and 'location' is the origin.  The direct and indirect";
+"objects are undefined.";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+who = args[1];
+orig = who.location;
+dest = args[2];
+if (who.wizard && !(caller in this.trusted_callers || caller_perms().wizard))
+  return E_PERM;
+elseif (!$object_utils:isa(dest, $room))
+  return E_INVARG;
+elseif (!is_player(who))
+  return E_INVARG;
+elseif (who.location == dest)
+  who:tell("You are already there.");
+  return 1;
+elseif ($object_utils:isa(dest, $generic_editor))
+  who:tell("Sorry, you can't enter an editor this way.");
+  return E_INVARG;
+endif
+leave_succeeded_msg = args[3] || this:leave_succeeded_msg(who, dest);
+oleave_succeeded_msg = args[4] || this:oleave_succeeded_msg(who, dest);
+leave_failed_msg = args[5] || this:leave_failed_msg(who, dest);
+oleave_failed_msg = args[6] || this:oleave_failed_msg(who, dest);
+arrive_msg = args[7] || this:arrive_msg(who, dest);
+oarrive_msg = args[8] || this:oarrive_msg(who, dest);
+dest:bless_for_entry(who);
+if (!dest:accept(who))
+  who:tell("Sorry, but ", dest:name(1), " appears to be locked.  You can't go there.");
+  if (oleave_failed_msg && oleave_failed_msg != "$")
+    orig:announce_all_but({who}, who:name(), " ", $string_utils:pronoun_sub(oleave_failed_msg, who, dest, orig));
+  endif
+  return 0;
+endif
+if (leave_succeeded_msg && leave_succeeded_msg != "$")
+  who:tell_lines($string_utils:pronoun_sub(leave_succeeded_msg, who, dest, orig));
+endif
+who:moveto(dest);
+if (who.location != dest)
+  if (leave_failed_msg && leave_failed_msg != "$")
+    who:tell_lines($string_utils:pronoun_sub(leave_failed_msg, who, dest, orig));
+  endif
+  if (oleave_failed_msg && oleave_failed_msg != "$")
+    orig:announce_all_but({who}, $string_utils:pronoun_sub(oleave_failed_msg, who, dest, orig));
+  endif
+  return 0;
+endif
+if (oleave_succeeded_msg && oleave_succeeded_msg != "$")
+  orig:announce_all($string_utils:pronoun_sub(oleave_succeeded_msg, who, dest, orig));
+endif
+if (arrive_msg && arrive_msg != "$")
+  who:tell_lines($string_utils:pronoun_sub(arrive_msg, who, dest, orig));
+endif
+if (oarrive_msg && oarrive_msg != "$")
+  dest:announce_all_but({who}, $string_utils:pronoun_sub(oarrive_msg, who, dest, orig));
+endif
+return 1;
+"Last modified Mon Nov  6 01:21:50 1995 IST by EricM (#3264).";
+.
+ 
+@verb $teleporter:"leave_succeeded_msg" this none this rxd BioGate_wizard
+@program $teleporter:leave_succeeded_msg
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+return "You go to " + args[2]:name(1) + ".";
+"Last modified Mon Mar 11 00:14:12 1996 IST by EricM (#3264).";
+.
+ 
+@verb $teleporter:"oleave_succeeded_msg" this none this rx BioGate_wizard
+@program $teleporter:oleave_succeeded_msg
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+who = args[1];
+return $string_utils:substitute(who.odepart_msg, {{"%T", "%N"}, {"%t", "%n"}}) || tostr(who:name(), " finds ", who.gender.pp || who.pp, " way out.");
+"Last modified Tue Sep 19 16:14:58 1995 IST by Gustavo (#2).";
+.
+ 
+@verb $teleporter:"leave_failed_msg" this none this rxd BioGate_wizard
+@program $teleporter:leave_failed_msg
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+return "It appears " + args[2]:name(1) + " won't let you in.";
+"Last modified Tue Dec  6 11:42:11 1994 IST by EricM (#3264).";
+.
+ 
+@verb $teleporter:"oleave_failed_msg" this none this rxd BioGate_wizard
+@program $teleporter:oleave_failed_msg
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+return "";
+"Last modified Tue Dec  6 11:44:01 1994 IST by EricM (#3264).";
+.
+ 
+@verb $teleporter:"arrive_msg" this none this rxd BioGate_wizard
+@program $teleporter:arrive_msg
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+return "";
+"Last modified Tue Dec  6 11:45:13 1994 IST by EricM (#3264).";
+.
+ 
+@verb $teleporter:"oarrive_msg" this none this rx BioGate_wizard
+@program $teleporter:oarrive_msg
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+who = args[1];
+return $string_utils:substitute(who.oarrive_msg, {{"%T", "%N"}, {"%t", "%n"}}) || tostr(who:name(), " finds ", who.gender.pp || who.pp, " way in.");
+"Last modified Tue Sep 19 16:16:07 1995 IST by Gustavo (#2).";
+.
+ 
+@verb $teleporter:"move_user_for_web" this none this rxd BioGate_wizard
+@program $teleporter:move_user_for_web
+"move_user_for_web(who OBJ, where OBJ) -> none";
+"does the actual user movement for $teleporter:html and the VRML system";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+who = args[1];
+where = args[2];
+if (!(caller == this || caller_perms().wizard || $perm_utils:controls(caller_perms(), who)))
+  return E_PERM;
+endif
+if (exit = where in who.location.exits)
+  who.location.exits[exit]:invoke();
+  return;
+elseif (valid(who.location.location) && where == who.location.location && $set_utils:intersection($object_utils:ancestors(who.location), $web_utils.interior_rooms))
+  who.location:out();
+  return;
+elseif (!$object_utils:isa(where, $room))
+  who:tell(where:namec(1), " is not a place you can go to.");
+  return;
+elseif (where == who.location)
+  who:tell("You are already there!");
+  return;
+elseif ($object_utils:isa(where, $generic_editor))
+  who:tell("Sorry, you can't enter an editor this way.");
+  return;
+endif
+old_loc = who.location;
+who:moveto(where);
+if (who.location != old_loc)
+  old_loc:announce($string_utils:pronoun_sub(this:odepart_msg(who), who, who, old_loc));
+  who.location:announce_all_but({who}, $string_utils:pronoun_sub(this:oarrive_msg(who), who, who, who.location));
+  who:tell($string_utils:pronoun_sub(this:leave_succeeded_msg(who, where)));
+else
+  who:tell($string_utils:pronoun_sub(this:leave_failed_msg(who, where)));
+endif
+if (who.location != where)
+  who:tell("Hmmm... Looks like you haven't arrived at ", where:name(1), " after all.");
+  if (msg = this:oleave_failed_msg(who, where))
+    who.location:announce_all_but({who}, who:name(), " ", $string_utils:pronoun_sub(msg));
+  endif
+endif
+"Last modified Mon Apr  8 07:48:28 1996 IDT by EricM (#3264).";
+.
+ 
+@verb $teleporter:"html" this none this rx BioGate_wizard
+@program $teleporter:html
+"html(who, rest STR, search STR) -> $nothing or an HTML frg LIST";
+"This verb performs a variety of functions involving user teleporting via the web system";
+"The results of various URL specs are as follows:";
+"rest='home' send user to player.home";
+"rest='central_room' send user to this.central_room";
+"rest='teleport' search='object' send user to 'object'";
+"rest='object' return imagemap associated with 'object";
+"rest='object' search='X,Y' teleport user based on imagemap associated with 'object' to coord 'X,Y'";
+"rest='' search='X,Y' teleport user based on imagemap associated with player.location, to coord 'X,Y'";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+if (player.wizard && !(caller in {$standard_webviewer, $web_geninfo, @this.trusted_callers}) && !caller_perms().wizard)
+  return E_PERM;
+  "note that move restrictions are only imposed on moving wizard characters";
+endif
+who = player;
+rest = args[2];
+search = args[3];
+"First check if it's a web request to teleport the user, apart from any imagemap stuff";
+if (rest == "home")
+  player:home();
+  return $nothing;
+elseif (rest == "central_room")
+  this:move_user_for_web(who, this.central_room);
+  return $nothing;
+elseif (rest == "teleport" && valid(where = toobj(search)))
+  "it's a @go request via the web";
+  "if path has form '.../teleport?9999' then teleport to object 9999";
+  this:move_user_for_web(who, where);
+  return $nothing;
+endif
+set_task_perms(caller_perms());
+if (rest && valid(container = toobj(rest)) && (map = container.image_map))
+  "use image map associated with object specified by 'rest' if valid";
+  rooms = container.imagemap_rooms;
+  regions = container.imagemap_regions;
+elseif (rest && !(valid(container) && container.image_map))
+  player:tell("There seems to be an error in the teleporter map you selected. You don't move anywhere.");
+  return $nothing;
+else
+  "Find the appropriate image map for the user, by starting from player.location";
+  "and working outward until a container/room with an .image_map property is found";
+  container = player.location;
+  while (valid(container) && !container.image_map)
+    container = container.location;
+  endwhile
+  if (!valid(container))
+    "use the MOO's default image map";
+    map = this.image_map;
+    container = this;
+  endif
+endif
+map = container.image_map;
+rooms = container.imagemap_rooms;
+regions = container.imagemap_regions;
+if (!search)
+  "return HTML frg for inserting MOO's default teleport map";
+  "note that if no value for $teleporter.default_mapsize is given, no size is specified for the browser, which may delay pasteup of the web page; however, if you give a map size, all maps must be that size or the region mapping will be off";
+  mapsize_spec = this.default_mapsize ? tostr(" WIDTH=", this.default_mapsize[1], " HEIGHT=", this.default_mapsize[2]) | "";
+  return map ? {tostr("<CENTER><TABLE BORDER=8><TR><TD><A HREF=\"&LOCAL_LINK;/view/", tonum(this), "/", tonum(container), "\"><IMG SRC=\"", map, "\"", mapsize_spec, " ismap></A></TD></TR></TABLE></CENTER>")} | {};
+endif
+"This call is an image map selection requesting the user be teleported";
+coord = {tonum(search[1..(idx = index(search, ",")) - 1]), tonum(search[idx + 1..length(search)])};
+idx = $web_utils:interpret_map(coord, regions);
+if (!idx || !valid(loc = rooms[idx]))
+  player:tell("You selected a point on the map not assigned to any place.");
+  return $nothing;
+endif
+this:move_user_for_web(who, loc);
+return $nothing;
+"Last modified Tue Jul  1 19:51:21 1997 IDT by EricM (#3264).";
+.
+ 
+@verb $teleporter:"odepart_msg" this none this rx BioGate_wizard
+@program $teleporter:odepart_msg
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+who = args[1];
+return $string_utils:substitute(who.odepart_msg, {{"%T", "%N"}, {"%t", "%n"}}) || tostr(who:name(), " finds ", who.gender.pp || who.pp, " way out.");
+"Last modified Tue Sep 19 16:16:38 1995 IST by Gustavo (#2).";
+.
+ 
+@verb $teleporter:"init_for_core" this none this rxd BioGate_owner
+@program $teleporter:init_for_core
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+if (!(caller == this || caller_perms().wizard))
+  return E_PERM;
+endif
+this.trusted_callers = {};
+this.imape_mag = "";
+this.imagemap_regions = {};
+this.imagemap_rooms = {};
+return pass(@args);
+"Last modified Wed Aug 21 22:44:52 1996 IDT by EricM (#3264).";
+.

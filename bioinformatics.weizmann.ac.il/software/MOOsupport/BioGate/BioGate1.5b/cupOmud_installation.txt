@@ -1,0 +1,50 @@
+INSTALLING THE CUP-O MUD JAVA TELNET CLIENT
+
+The Cup-O MUD Java telnet client allows you to create an integrated
+interface using any Java-complient web browser that supports frames.
+By presenting users with both a web display and interactive telnet
+window, they can use the full power of the MOO without any need to
+install or setup software they may not already have.  By integrating
+the telnet client into the web browser, automatic updating of the web
+display can be performed by the telnet client.
+
+To install the Cup-O MUD system in your MOO:
+ 1. Complete the installation of the BioGate System
+
+2. Create a subdirectory for the Java class files on your MOO server
+where it can be accessed through a standard HTTP server.  For
+instance, you might create a subdirectory:
+    http://node.site.org/java/cupOmud/
+
+3. Expand the CupOmud_exec.zip file included with this package into
+the /java/cupOmud subdirectory.  If the file isn't there, you should
+get a copy of the latest Cup-O MUD release from
+"http://www.du.org/java/CupOmud/" which should have a link to the
+compiled files as a ZIP archive.  In addition to the documentation,
+there should be two "class" files; "CupOmud.class" in the main
+directory, and "Applet.class" in an "mudclient" directory that should
+be automatically created by the unZIP process.
+
+4. Create a child of the $jclient_handler, named "Cup-O MUD Handler"
+and set its "client_name" property to "CupOmud/CupOmud"  You may wish
+to customize its ".default_preload_page" which is the text displayed
+before the Java telnet client has finished loading and connecting to
+the MOO.
+
+5. Set the $http_handler.javaclient_codebase property to the
+directory where all your java programs are located.  For the above
+example, "/java/" is the correct setting.  The final location of the
+class file for the Cup-O MUD main class file is constructed as:
+$network.site + $http_handler.javaclient_codebase +
+<jclient_handler>.client_name
+
+6. Add the Cup-O MUD handler object to the list of handlers with
+permission to use the HTTP system, by adding it to the list in the
+$http>handler.java_clients property.
+
+7. Insert the relevent form data into your MOO's gateway page.  You
+can simply copy the form from the example file "gateway.txt" in the
+package.  The only item you MUST change is the value for "client"
+which should be the numeric part of the Cup-O MUD handler's object
+number.  For instance, if it was object #404, then you should use
+"404" as the value for "client" in the gateway page form.

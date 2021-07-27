@@ -1,0 +1,43 @@
+"Compiled time utilities (#44) at Fri Jul 18 21:29:44 1997 IDT";
+"  Some MOOs don't have $time_utils:short_time so it's included below.";
+"Don't bother adding it if your MOO already has this utility verb.";
+
+ 
+@verb $time_utils:"short_time" this none this rxd BioGate_owner
+@program $time_utils:short_time
+su = $string_utils;
+time = args[1];
+if (length(args) > 1)
+  parts = args[2];
+else
+  parts = 1;
+endif
+if (length(args) > 2)
+  del = args[3];
+else
+  del = " ";
+endif
+result = " ";
+for i in [1..parts]
+  if (time >= 31536000)
+    result = tostr(time / 31536000, "Y");
+    time = time % 31536000;
+  elseif (time >= 2592000)
+    result = tostr(result, del, su:right(time / 2592000, 2), "M");
+    time = time % 2592000;
+  elseif (time >= 86400)
+    result = tostr(result, del, su:right(time / 86400, 2), "D");
+    time = time % 86400;
+  elseif (time >= 3600)
+    result = tostr(result, del, su:right(time / 3600, 2), "h");
+    time = time % 3600;
+  elseif (time >= 60)
+    result = tostr(result, del, su:right(time / 60, 2), "m");
+    time = time % 60;
+  elseif (result[length(result)] != "s")
+    result = tostr(result, del, su:right(time, 2), "s");
+  endif
+endfor
+return su:triml(result, del);
+"Last modified Sun Aug 27 10:41:09 1995 IDT by Gustavo (#2).";
+.

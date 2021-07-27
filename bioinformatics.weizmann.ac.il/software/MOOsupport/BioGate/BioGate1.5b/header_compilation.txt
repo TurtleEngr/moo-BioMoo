@@ -1,0 +1,546 @@
+This file contains the header information for all objects in the package.  It is CRITICAL that you carefuly read this information before installing any object.  In addition, it will tell you what adjustments you may have to make in the object itself, or other MOO objects, after the object is installed.
+_________________________
+ 
+Header information for the Root Class Object (#1@BioMOO)
+  Some aliases may need to be added, depending on if your MOO already
+has a #1:name*c system in place.  Such a system generally returns
+either object.name or capitalized object.name with some grammar or
+title information.
+  If your MOO has no #1:name*c system, add the alias "name" to
+#1:title and add the alias "namec" to #1:titlec.
+__________________
+ 
+Header information for generic player (#6@BioMOO)
+  The changes for $player are by far the most complicated in the
+installation, and require some programming knowledge.  Take your
+time, and read these instructions carefully!
+
+  Note that the @join command, which nearly ubiquitous in MOOs, is
+not in older version of the standard LambdaCore.  The BioWeb system
+depends on the command having an executable component ($player:_join)
+which moves the user's character when called with an argument that is
+the object number of the object to join (ie. move to the same
+location as that object).
+  On many MOOs, the $player:@join command is monolithic, in which
+case you'll need to split it into command and executable halves, as
+in the example given in this file.  If you're starting with a bare
+LambdaCore, you can just add the "_join" verb given here, and
+optionally add the "@join" verb also if you wish your users to have
+this functionality.
+  If you are using one of the newer versions of the LambdaCore, with
+Frand's Player Class being used as the base character object instead
+of the old #6, then you already have a @join command, but it's not on
+$player.  The above instructions then apply to the @join command on
+Frand's Player Class.
+
+  Additional changes to $player that need to be made:
+
+1. Add "set_web_option" as an alias for $player:set_mail_option
+
+2. Add the aliases @webop*tions and @web-op*tions to $player:@mailop
+
+3. Modify $player:@mailop to include the 'web option' possibility.
+Note that the line immediately after
+'set_task_perms(player)' will need to read something like:
+what = {"mail", "edit", "display", "web"}[index("medw", verb[2])];
+
+4. Make $player:home executable (with:@chmod $player:home +x) and add
+the following lines to the start of the verb:
+  if ((caller!=this) && !$perm_utils:controls(caller_perms(),this))
+    return E_PERM;
+  endif
+__________________
+ 
+Header information for generic exit (#7@BioMOO)
+If your MOO has $exit.leave_msg not set, then user's won't see
+confirmation of their web-initiated movement via exits confirmed in
+the telnet window  If you wish to change this, you could set
+$exit.leave_msg to something like:  You move %t.
+__________________
+ 
+Header information for the generic note (#9@BioMOO)
+  The $note:html verb will only show text to calls with
+$note:is_readable_by perms.
+  The $note:html verb tests for the presence of a property on $note
+called 'content_type' and if it is either not defined or has a value
+of 'TEXT/PLAIN' then the text is treated as <PRE> but with linebreaks
+added  This will handle most MOO notes for now. A more complete
+MIME-like treatment still needs to be developed.
+__________________
+ 
+Header information for the HTTP Handler (#98@BioMOO)
+  The MOO presents the user with a web gateway page when they contact
+the MOO via the URL 'http://node.domain:port' where 'port' is the
+port your MOO is listening for HTTP connections on.  This page
+should tell the user how to connect to the web system and offers the
+appropriate links.  It is not necessarily the MOO's home page, though
+it could be used as such.
+  The BioWeb system detects if you have the BioMOO File Utilities
+Package (FUP) installed, and if so then it uses an external file
+"/web/gateway.html" or "/misc/gateway.html" as the web gateway page
+if it can find either of these.  The paths to search are defined
+within the "$http_handler:provide_identify" verb.  If no FUP
+installation is detected, then the web gateway page text is assumed
+to be given in the "$http_handler.gateway_html" property.
+  You'll need to set the property $http_handler.webpass_handler to
+the Webpass Hander object number.  The Webpass Hander object is the
+BioWeb object that stores and handles webpass strings, temporary
+passwords used to authenticate web connections.    If your MOO is
+using the commonly found lag meter, then $http_handler:use and
+:handle can check it and reject anonymous web connections if the lag
+gets too high.  The lag meter should have a property "samples" that
+is a list of recently measured lag times, and "sample_count" which
+gives the number of samples in the "samples" property. There is also
+a test, whether or not you have the lag meter, to reject anonymous
+web connections if more than a certain number of web transactions are
+already being processed.  The relevent properties are
+$http_handler.lag_meter (set it to the object number of the lag meter
+on your MOO), and $http_handler.anon_access_limits (a list of two
+numbers; the first is the maximum number of web tasks in progress
+before anonymous web connections are rejected, and the second is the
+average lag in seconds above which anonymous web connections are
+rejected).  You can leave the "anon_access_limits" property at its
+default value, but you should set the "lag_meter" property if your
+MOO uses the standard lag meter.
+  Many MOOs have a property $login.watchers that's used to note
+objects with verb to be called when a user connects (used by the
+Byte-Based Utilities, for example).  If your MOO has such a
+property, then add the object number for the Webpass Handler to the
+list of objects that watch logins in the $login.watchers property.
+If your MOO doesn't use $login.watchers, you should add a call to the
+HTTP handler's :user_disconnected verb from $player:disfunc, such as:
+  $http_handler:user_disconnected();
+__________________
+ 
+Header information for the Generic Interior Room (#139@BioMOO)
+  The interior room object is common on MOOs and support for it is
+given inthe BioWeb package.  It's basic definition from the BioWeb
+package's perspective is that is is a room with an two executable
+(+x) verbs, one named 'exit' and the other 'enter' and that the verbs
+cause the user to exit or enter the room, respectively.
+  Note that on some MOOs a descendent of the generic interior room,
+often called the generic portable room, is the object bearing the
+exit and enter verbs and is the appropriate object for modifying.
+__________________
+ 
+Header information for Gustavo's GGS (#206@BioMOO)
+Generic gopher slate
+__________________
+ 
+Header information for the generic bulletin board (#1200@BioMOO)
+Generic bulletin board (the sort that takes posted $note objects)
+__________________
+ 
+Header information for the User Information Customiser (#1417@BioMOO)
+  Used to set basic user characteristics via web.  User
+characteristics handled by this:method_get and this:method_post are
+common to all LambdaCore derived MOOs.  If your MOO has specific
+local information that users should be able to modify, add
+:local_get() and :local_post() verbs to deal with that portion
+specifically.
+__________________
+ 
+Header information for the generic sign (#1438@BioMOO)
+Generic sign; an object that you can 'read' and 'look' at to see the same thing.
+__________________
+ 
+Header information for the <B>Standard Web Viewer</B> (#1819@BioMOO)
+  The default web viewer.  Only accepts users with parallel
+telnet/client connections.
+  The "find_clients_text" is a list of strings to insert that tells
+users where to get information on client programs for MUD/MOO telnet
+access.
+__________________
+ 
+Header information for the Object Browser/Editor (#2394@BioMOO)
+  The default object browser and editor.
+  The "raw_prop_edit_instructions" has a warning about using the raw
+edit capability of the Object Browser/Editor.  Note that users can
+mess up +c properties (same as by using the @set command).
+__________________
+ 
+Header information for the Webpass handler (#2425@BioMOO)
+Note that the Webpass Handler is not a MOO core object.  You must set
+the "webpass_handler" property of the $http_handler to point to the
+webpass handler.  You can set it with:
+  @set $http_handler.webpass_handler to <object number of webpassHandler>
+If you want to allow anonymous access to your MOO through the web
+system, you should add entries for "anonymous" and "anon" here.
+Assuming the value of $no_one in your MOO is #38, you can use:
+  @prop webpassHandler.anon #38 "" biogate_owner
+  @prop webpassHandler.anonymous #38 "" biogate_owner
+__________________
+ 
+Header information for the HTML Editor (#2789@BioMOO)
+Allows editor functions for HTML docs associated with object.
+Someone should really write user commands for handling links and other tags.
+__________________
+ 
+Header information for the generic WWW application (#3072@BioMOO)
+All valid webapps must be descendents of this object.
+__________________
+ 
+Header information for the Basic Help Database (#3131@BioMOO)
+  These verbs should either go on $help or on a parent of it. On
+$help is recommended.  The properties are typical texts for a
+LambdaCore help database.  If you are storing help texts on files
+outside the database using the FUP package, you'll have to put these
+there too using whatever scheme you used to externalize the core
+texts.
+__________________
+ 
+Header information for the Viewer Customiser (#3237@BioMOO)
+Designed to work with the Standard Viewer ($standard_webviewer).
+__________________
+ 
+Header information for Who's On-line (HTML 3.0) (#3260@BioMOO)
+Requires that the browser can handle HTML tables.
+__________________
+ 
+Header information for the general teleporter object (#4002@BioMOO)
+Also covers general user teleportation messages, not just for the
+web.  You'll have to set the "central room" property on this object
+to the object number of the room you wish to be on the button bar for
+the Standard Web Viewer as the "central" room of the MOO, if you want
+it to be anything other than the default (#11).
+  The default imagemap info for the MOO is also on this object. As
+with the rest of the BioGate package's mapping system, "image_map" is
+the URL for the map (eg. "http://where.edu/map.gif"), imagemap_rooms
+is the list of rooms (eg. {#11, #2323,...}), and imagemap_regions is
+the list of regions (in $web_utils:interpret_map format)
+corresponding to the rooms.  In order to generate a consistant feel
+in the MOO, the maps are expanded/contracted to fit the dimensions
+given in default_mapsize (as a width, height pair, eg. {100,50}).
+  You must add the Standard Viewer's object number to the list of
+$teleporter.trusted_callers for the "go" function on the Standard
+Viewer's command form to work properly.
+__________________
+ 
+Header information for the General Info Provider (#3394@BioMOO)
+  Provides some '@who' functions and is a dump for future additions
+to general info gathering facilities
+  Note that :user_info() and :short_user_info() make calls to
+this:local_user_info which by default is not defined on the General
+Info Viewer.  If there is appropriate MOO-specific information you
+want included on people's home pages, add :local_user_info() and have
+it return info on the person given in args[1].  The info should be an
+HTML document fragment: a list of strings.  You can check the
+:user_info() verb for details.
+  The form generated by this object is on its "generalinfo_html"
+property.
+__________________
+ 
+Header information for mouse's Assorted Web Commands (#3417@BioMOO)
+These can optionally be added to $player.
+__________________
+ 
+Header information for the WWW Options (#3830@BioMOO)
+This option package includes support for some features that are only
+supported by a few web browsers at this time (ie. color and
+background settings).  If the user's browser doesn't support this
+feature, the settings will have no effect, but also won't be a
+problem.
+__________________
+ 
+Header information for the webMOO code utilities (#3909@BioMOO)
+   Set the "MOO_home_page" property on this object to the URL of
+your own MOO'ss home page.  This could be the same as the MOO's web
+gateway page (the HTML document in $http_handler.identify_html, or
+"web/identify.html" if your MOO uses FUP).
+  Set the "page_banner" property on this object to the graphic that
+will serve as your page banner (appears at the top of the MOO's web
+pages).
+  The "uparrow_icon" property is a string inserted into the Standard
+Webviewer's page to indicate "go to the top of the page" and can be
+either text or an <IMG> link to an arrow image.
+  The "interior_rooms" property is a list of generic rooms whose
+children have an :exit() verb on them that should be added to the
+list of exits generated by the Standard Viewer.
+  The "web_helppage" property that optionally has a URL for an
+outside page that has information about using the MOO or the MOO's
+web system.
+  The background and colors of the MOO's default web page appearance
+is defined in the following properties:
+  std_bkgnd  =  a string with the URL for an image to use as the web
+page background
+  std_bgcolor  == the background color to use (ignored if std_bkdnd
+is set)
+  std_textcolor, std_linkcolor, std_vlinkcolor, std_alinkcolor == the
+standard plain text, link text, visited link text, and "active"
+(currently selected) link text colors.  The value should either be an
+empty string (no value set) or a string to use in the <BODY> tag (eg.
+"#FF0000" means red).
+__________________
+ 
+Header information for the generic room (#3@BioMOO)
+  The generic room's enterfunc verb should be slightly modified for
+the web system, so that the user does not see the room description in
+both the telnet and web windows when they change rooms (because it's
+spammy and a waste of bandwidth).
+  See the comments in the verb below for more details.  Note that the
+entire verb from BioMOO is reproduced here for context only.  Do NOT
+just paste in this whole script else it will over-write your own
+MOO's $room:enterfunc verb.  Everything here except the
+$room:enterfunc verb can be pasted in.
+__________________
+ 
+Header information for generic wizard (#58@BioMOO)
+  The $wiz:moveto verb has a hook to allow legitimate objects,
+primarily MOO text editors, to move wizard characters.  You'll need
+to add the BioWeb package's HTML Editor to that list of legitimate
+objects.
+  The BioMOO $wiz:moveto verb is reproduced here for context only.
+Line 1 shows the appearance of $html_editor in the list of permitted
+callers.
+__________________
+ 
+Header information for the Login Commands (#12@BioMOO)
+  If your MOO's main telnet entry port will never be used for HTTP
+connections, you can skip some of the changes to $login.  If only
+non-telnet ports will be used, you need only modify the
+$login:parse_command to use $login verbs of type "any none this" (as
+described below), install the :preapproved and :accept_preapproval
+verbs, and the .preapproved property, which are all required by the
+java telnet applet system.  If you want your $network.port also used
+as an HTTP port, continue with the instructions below.  It is
+recommended that you DON'T use your main telnet port as an HTTP port,
+but establish a separate port to handle those transactions.
+
+  To allow your MOO to function as an HTTP/1.0 server for connections
+to the telnet port, you need to make the welcome text into valid
+HTML/1.0 comment lines, as well as include an HTTP/1.0 opening header
+line.  To do this, add the "merge_welcome_line" verb to $login, and
+replace the MOO's $login:help with the "help_http1.0" verb given
+below.  Don't name it "help_http1.0" but just use the below labeled
+verb as the source of new code for $login:help.  These two verbs will
+transform your $login.welcome_message text into proper HTML/1.0
+header line syntax when they are displayed.
+  The simplest way to allow HTTP calls to your standard telnet/client
+port is to add the verb given below as "GET POST" with args "any none
+any" to $login.  However, this will cause GET to appear as a
+legitimate login command during user connection, possibly confusing
+users.  A nice solution is to add the "GET POST" verb with args "any
+none this" (as shown below), and to slightly modify
+$login:parse_command as noted in the example below, so that "any none
+this" verbs don't appear as user options, but the $login:GET command
+is still available as a legitimate command.  This still allows the
+usual "any none any" verbs (like "connect") to function as before.
+  Note that $login:check_for_shutdown has also been modified to make
+it complient with HTTP/1.0 calls (turned into an extended HTML header
+comment line).
+  IF YOUR $LOGIN:PARSE_COMMAND AND $LOGIN:CHECK_FOR_SHUTDOWN ARE NOT
+LAMBDACORE STANDARD, DON'T JUST PASTE IN THE VERB OF THAT NAME FROM
+THIS FILE, OR YOU'LL LOSE YOUR CHANGES.
+__________________
+ 
+Header information for the string utilities (#20@BioMOO)
+  You can enable (nearly) full ascii character usage for your MOO's
+web system by setting the "full_ascii" and "ansi" properties which
+will be added to $string_utils as part or the package.  By default,
+they will be set to the empty string, and the web system will use the
+standard LambdaCore $string_utils.ascii instead.
+  If you have FUP installed on your MOO, you can set these properties
+with the lines:
+
+  ;$string_utils.full_ascii_data = fileread("<web_package_dir>",full_ascii.txt)[1]
+
+and
+
+  ;$string_utils.ansi = fileread("<web_package_dir>",ansi_data.txt)[1]
+
+where <web_package_dir> is the path leading to where the package
+files are kept.  It is necessary to set these properties this way
+because they include the carriage return character, which you can't
+normally include in a MOO value.  If you don't have FUP installed, it
+is recommended you just leave the .full_ascii and .ansi properties as
+empty strings since they are not critical to the web system's
+function.
+  Within the web system, only users with wizardly perms will have
+access to the $string_utils.full_ascii property, while others will
+have access to the $string_utils.ansi values instead.  Note that
+neither value will include the line feed character (ascii 10), since
+that's used by the MOO server, and it's presence would corrupt the
+database.
+
+  Make sure that your $string_utils:is_numeric verb has the
+additional alias of "is_integer" since with the advent of FLOAT
+values this is an important distinction.
+
+  The substitute_suspended verb is provided here, but is just a copy
+of $string_utils:substitute that can suspend.  It's provided as a
+separate verb since some MOOs have customized their
+$string_utils:substitute verb and won't want to over-write it.
+However, you can just modify your $string_utils:substitute with the
+alias substitute_suspended and have calls to the alias allowed to
+suspend.
+__________________
+ 
+Header information for the Wizard Utilities (#26@BioMOO)
+  The $web_utils:call_verb_with_other_perms verb is used by the verb
+'method_post' on the Character Customizer.  It's a generally useful
+verb for other purposes, though.
+__________________
+ 
+Header information for the time utilities (#44@BioMOO)
+  Some MOOs don't have $time_utils:short_time so it's included below.
+Don't bother adding it if your MOO already has this utility verb.
+__________________
+ 
+Header information for Anonymous (#40@BioMOO)
+  You'll probably want to rename $no_one to "Anonymous", adding the
+previous name and aliases as aliases.
+  In addition, to work with the
+webghost viewer properly, set the value of $no_one.web_options to
+include the ghostviewer as the specified viewer.  A good method is to
+enter:
+
+  ;$no_one.web_options = {"applinkdown","showdest",{"viewer",$anon_webviewer}}
+
+  If you want to allow anonymous access to the webapp
+list, make the special web passwords "anonymous" and "anon" point to
+$no_one.  First, set $http_handler.webpass_handler to the object
+number of the webpass handler.  Then you can:
+
+;add_property($http_handler.webpass_handler, "anon", $no_one, {$http_handler.webpass_handler.owner,""})
+;add_property($http_handler.webpass_handler, "anonymous", $no_one, {$http_handler.webpass_handler.owner,""})
+
+  This setup is not the default because some people will not wish to
+allow anonymous web browsing of their MOO.  Such anonymous browsing
+can't harm or otherwise interfere with the MOO, but it does use
+computing resources that might be precious if your MOO is laggy.
+__________________
+ 
+Header information for the Generic HTTP/1.0 Port Listener (#711@BioMOO)
+  This is the generic device for listening at an HTTP port.  You
+should probably not use this object itself, unless you're SURE you'll
+never want to listen for HTTP connections at more than one port.
+  Obviously, it's only useful if your MOO has implemented multiple
+port listen, either using server patches or with a LambdaMOO server
+no older than 1.8.0.
+  To set it up, set its "handles_port" property to the port it should listen
+to, it's "handler" property to the object that will be processing
+what it hears (generally that will be $http_handler), and any other
+properties you need to customize.
+  You should use calls to it's "listen" and "unlisten" verbs to start
+and stop it.
+  The "authentication_method" property is used by
+$http_handler:handle_http10 to determine which authentication to use.
+Valid values are currently: webpass, cookies, and web-authentication.
+The "cookies" method is strongly recommended.  Documentation on web
+cookies is available at:
+  http://home.netscape.com/newsref/std/cookie_spec.html
+and on web authentication at:
+  draft-ietf-http-v10-spec-03.html
+which is the current draft of the HTTP/1.0 standard
+(available wherever internet RFC files are stored near you).
+__________________
+ 
+Header information for the Standard VRML/1.0 Viewer (#3383@BioMOO)
+  This webapp should also work pretty well for VRML/2.0 applications
+also, but we might want something fancier once we have to deal with
+live connections between VRML objects and the MOO for real-time
+control.
+__________________
+ 
+Header information for the VRML Utilities (#3384@BioMOO)
+  Many of the verbs and such on this are still under development.
+This is still BEATA software, but it works OK.
+
+  The property "link_to_web" is a VRML fragment (list of strings)
+giving the object to use as the link to a the room's web page fromthe
+VRML scene.  It hangs in the site defined by the "std_linkzone" line
+(a Transform node) which is an offset from the room's origin.
+For instance, "link_to_web" could be:
+   {"WWWInline { name "http://www.cco.caltech.edu/~mercer/vrml/web.wrl" }"} 
+and "std_linkzone:
+   {"Transform { translation -6 3 -12 }"}
+Note that all room controls that should appear in every room go in
+the standard linkzone.  Users can customize where that link zone
+appears in one of their rooms with the @set-vrml command's "linkzone"
+VRML setting.
+
+  The "std_roomlights" has the default for what room lighting should
+be, which can be overridden on individual rooms with the "lights"
+VRML setting.  The default is:
+{"DirectionalLight {on TRUE intensity .4 color .8 .8 .8 direction .75 -1 0}", "DirectionalLight {on TRUE intensity .7 color .8 .8 .8 direction -.75 -1 -.5}", "DirectionalLight {on TRUE intensity .7 color .8 .8 .8 direction 0 0 1}"} 
+__________________
+ 
+Header information for the Generic JavaClient Handler (#2380@BioMOO)
+Each Java client needs a handler to parse it's input form and create
+the html file with the embedded <APPLET> in it.  This object is the
+default handler and functions with the Cup-O MUD java telnet client
+or any compatible client.  You can override the verbs as needed to
+create customized handlers.
+  The place where the java class file handled by this object may be
+found is calculated by concatenating:
+$network.site + $http_handler.javaclient_codebase +
+    <handler>.client_name
+__________________
+ 
+Header information for the Cup-O MUD handler (#1214@BioMOO)
+  This is a functional example of a Java client handler.  By default,
+the telnet java client is Cup-O MUD, and the CupOmud.class file is in
+the CupOmud directory of the $http_handler.javaclient_codebase
+directory of $network.site.
+  See the header text for the generic $jclient_handler for more
+information.
+__________________
+ 
+Header information for the MCP Utilities (#1768@BioMOO)
+A general purpose tools for communicating with MCP (MOO control
+protocol) complient clients.
+__________________
+ 
+Header information for <I><B>Be our Ghost! </B></I> - anonymous web viewer (#1297@BioMOO)
+  The "max_lag" property is the maximum lag (as measured by the
+$http_handler.lag_meter) after which WebGhost calls are rejected.
+  The "ghost_home" property is the room object number that is the
+home forweb ghosts: where they appear and where they return when they
+select the "home" link on the pages generated by te WebGhost Viewer.
+__________________
+ 
+Header information for the permissions utilities (#42@BioMOO)
+  The "password_ok" verb is used to test passwords, and should use
+your MOO's standard password test from $login:connect.  It is
+recommended that you have $login:connect and any other password
+tessting verb in the MOO call $perm_utils:password_ok, since it will
+simplify updating the password checking to more secure systems if you
+wish to do so in the future.
+  If your MOO does not use the standard LambdaCore password checking
+(or your server doesn't have a Unix-like crypt), you'll need to
+modify $perm_utils:password_ok to function with your system.
+__________________
+ 
+Header information for the Mail Browser (#2048@BioMOO)
+The $mail_browser uses the permissions of $no_one for anonymous
+access.  However, this causes problems if $no_one on your MOO is a
+child of $player, and all the mail functions are on a different
+character (usually $mail_recipient_class if your MOO is that way).
+The simplest solution is to "@chparent $mail_recipient_classno_one to
+$" but alternatively you can use:
+  @prop $no_one.current_message {0,0} c $hacker
+  @prop $no_one.mail_lists {} rc $hacker
+If "@d $no_one.current_message" returns a value and not "Property not
+found" then you don't need to mess with any of that.
+
+  The "headerlist_len" property is the length of the headers list
+displayed when someone browses a folder.
+
+  The "guest_subscribed_folders" is the list of mail folders (as a
+LIST of OBJ numbers) that guest and anonymous web users are shown as
+their "subscribed" folders.  They can access the others (that are
+public) through the "list all folders" link, but this is basically
+the short list of ones you recommend.
+__________________
+ 
+Header information for the System Object (#0@BioMOO)
+*********    ***********    ***********
+IMPORTANT!!!!!!  Do NOT just paste the following verbs into your MOO.
+The only parts you need are marked off by "--- used by MCP-aware
+telnet clients ----" at the start and " ---- " at the end.  The
+entire verb is given only to provide context for determining where in
+your MOO's verb to add the needed section.  Header text given before
+each verb below will help you determine where in the verb the new
+section needs to be added.
+__________________
+__________________

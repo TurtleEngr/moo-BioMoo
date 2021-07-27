@@ -1,0 +1,23 @@
+"Compiled Generic Editor Object (#51) at Fri Jul 18 21:29:16 1997 IDT";
+
+ 
+@verb $generic_editor:"html" this none this rxd BioGate_wizard
+@program $generic_editor:html
+"html( ) -> HTML doc LIST";
+"Simply returns the text currently loaded in the editor for 'player'";
+"in <PRE> format. Someone should really make this return a full HTML";
+"form and such, for proper web editing.";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+if (!($object_utils:isa(caller, $webapp) || player.location != this))
+  return E_PERM;
+endif
+if (!(who = this:loaded(player)))
+  return {this:nothing_loaded_msg()};
+endif
+text = {@typeof(t = this.texts[who]) == STR ? {t} | t};
+text = $web_utils:html_entity_sub(text) || {"[no text loaded]"};
+text[1] = tostr("<BR CLEAR=\"RIGHT\"><PRE>", text[1], "<BR>");
+text = {tostr("<BR><B>Editing: ", this:working_on(who), "</B><P>"), @text, "</PRE>"};
+return text;
+"Last modified Thu Aug 15 01:41:44 1996 IDT by EricM (#3264).";
+.

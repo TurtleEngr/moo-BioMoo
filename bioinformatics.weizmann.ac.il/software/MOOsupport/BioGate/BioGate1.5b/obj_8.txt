@@ -1,0 +1,29 @@
+"Compiled generic container (#8) at Fri Jul 18 21:29:14 1997 IDT";
+
+ 
+@verb $container:"more_info_for_web" this none this rx BioGate_wizard
+@program $container:more_info_for_web
+"more_info_for_web(who) -> HTML doc LIST";
+"Generates an HTML doc fragment with a hyperlinked list of the";
+"container's contents.";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+who = args[1];
+code = $web_utils:get_webcode();
+text = {};
+if (!this.dark)
+  if (!this.contents)
+    text = {@text, "<BR>", this:empty_msg()};
+  else
+    text = {@text, "<P><B>Contents:</B> ", $web_utils:english_list_with_urls(who, code, this.contents)};
+  endif
+endif
+return {@text, "<P>"};
+"Last modified Tue Aug  1 02:08:45 1995 IDT by EricM (#3264).";
+.
+ 
+@verb $container:"has_url" this none this rx BioGate_wizard
+@program $container:has_url
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+return pass(@args) || !!this:contents();
+"Last modified Sun Aug 27 06:40:01 1995 IDT by EricM (#3264).";
+.

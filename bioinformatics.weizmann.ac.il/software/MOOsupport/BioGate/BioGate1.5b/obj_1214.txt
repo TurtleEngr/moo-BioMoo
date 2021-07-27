@@ -1,0 +1,10 @@
+"Compiled Cup-O MUD handler (#1214) at Fri Jul 18 21:29:51 1997 IDT";
+"  This is a functional example of a Java client handler.  By default,";
+"the telnet java client is Cup-O MUD, and the CupOmud.class file is in";
+"the CupOmud directory of the $http_handler.javaclient_codebase";
+"directory of $network.site.";
+"  See the header text for the generic $jclient_handler for more";
+"information.";
+
+"The following property should already be defined on the object, with perms 'rc' and owner BioGate_wizard";
+@set comh.client_name to "CupOmud/CupOmud"

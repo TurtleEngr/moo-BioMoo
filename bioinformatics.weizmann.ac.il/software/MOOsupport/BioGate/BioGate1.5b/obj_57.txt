@@ -1,0 +1,61 @@
+"Compiled command utilities (#57) at Fri Jul 18 21:29:59 1997 IDT";
+
+ 
+"**********   **************   ************";
+"IMPORTANT!!!!!  Do NOT just paste the following text into your MOO.";
+"Only certain lines need to be added, depending on what sort of code";
+"you already have in place.  Modifying this verb is VERY tricky, in";
+"that if you insert a nasty typo you may no longer be able to enter";
+"text, depending on how your MOO is set up, and may have to restart";
+"the database with a checkpoint backup in which the";
+"$command_utils:read was not modified.  FORCE a checkpoint (with";
+"`;dump_database()' or whatever command your MOO has implemented to";
+"perform this function) just before you modify the $command_utils:read";
+"verb!!!";
+"";
+" There are two key aspects.  First, the $mcp test needs to be added";
+"immediately after the test for `typeof(ans)==ERR' and it's associated";
+"section (note the code below given for context.";
+"";
+"Second, a `while (1) ... endwhile' needs to enclose the section of";
+"the actual read() and the following processing.  Each of the tests in";
+"the processing after the read(), except for the $mcp one, generally";
+"should either return a value or kill the task (ie. with";
+"`kill_task(task_id())').  MCP reading tasks cycle through the";
+"`while' loop instead.";
+"";
+"In some MOOs, the LambdaCore $command_utils:read function has been";
+"split into parts.  The modifications generally should be performed on";
+"the part that has the actual read() command in it.";
+ 
+@verb $command_utils:"read" this none this rx BioGate_wizard
+@program $command_utils:read
+"$command_utils:read() -- read a line of input from the player and return it";
+"Optional argument is a prompt portion to replace `a line of input' in the prompt.";
+"";
+"Returns E_PERM if the current task is not a command task that has never called suspend().";
+if (args && typeof(args[1]) == STR)
+  prompt = args[1];
+else
+  prompt = "a line of input";
+endif
+c = callers();
+p = c[length(c)][5];
+p:notify(tostr("[Type ", prompt, " or `@abort' to abort the command.]"));
+while (1)
+  ans = read();
+  if (typeof(ans) == ERR)
+    return ans;
+    "--- used by MCP-aware telnet clients ---";
+  elseif ($mcp:is_reading(who) == 1 && $mcp:process_reading_line(who, ans))
+    "..line was part of an MCP multi-line request from the client, and was handled by $mcp.  Do nothing..";
+    "---";
+  elseif ($string_utils:trim(ans) == "@abort")
+    p:notify(">> Command Aborted <<");
+    kill_task(task_id());
+  else
+    return ans;
+  endif
+endwhile
+"Last modified Sun Oct  6 01:03:27 1996 IST by EricM (#3264).";
+.

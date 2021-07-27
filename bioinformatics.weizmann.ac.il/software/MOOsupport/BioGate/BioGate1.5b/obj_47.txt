@@ -1,0 +1,22 @@
+"Compiled Mail Distribution Center (#47) at Fri Jul 18 21:30:03 1997 IDT";
+
+ 
+@verb Postmaster:"name" this none this rxd BioGate_owner
+@program Postmaster:name
+"name ([what OBJ]) -> name STR";
+if (!args)
+  "with no args, return the $mail_agent's name itself";
+  return pass(@args);
+endif
+"otherwise, the requested mail recip's name";
+what = args[1];
+if (!valid(what))
+  name = "???";
+elseif ($object_utils:has_callable_verb(what, "mail_name"))
+  name = what:mail_name();
+else
+  name = what.name;
+endif
+return tostr(strsub(strsub(name, "(", ""), ")", ""), " (", what, ")");
+"Last modified Mon Jun 30 00:41:20 1997 IDT by EricM (#3264).";
+.

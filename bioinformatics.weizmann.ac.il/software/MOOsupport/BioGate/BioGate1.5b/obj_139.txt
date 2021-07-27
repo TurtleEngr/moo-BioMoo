@@ -1,0 +1,51 @@
+"Compiled Generic Interior Room (#139) at Fri Jul 18 21:29:18 1997 IDT";
+"  The interior room object is common on MOOs and support for it is";
+"given inthe BioWeb package.  It's basic definition from the BioWeb";
+"package's perspective is that is is a room with an two executable";
+"(+x) verbs, one named 'exit' and the other 'enter' and that the verbs";
+"cause the user to exit or enter the room, respectively.";
+"  Note that on some MOOs a descendent of the generic interior room,";
+"often called the generic portable room, is the object bearing the";
+"exit and enter verbs and is the appropriate object for modifying.";
+
+ 
+@verb $interior_room:"html" this none this rx BioGate_wizard
+@program $interior_room:html
+"Uses 'rest' to determine the webcall's function. Various rest values:";
+"  exit or out -> exit the room";
+"  enter -> enter the room";
+"  any other value -> pass(@args) [look at the room]";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+who = args[1];
+rest = args[2];
+search = args[3];
+set_task_perms(caller_perms());
+if (rest in {"exit", "out"})
+  this:exit(player);
+  return $nothing;
+elseif (rest == "enter")
+  this:enter(player);
+  return $nothing;
+endif
+return pass(@args);
+"Last modified Mon Apr  8 05:43:54 1996 IDT by EricM (#3264).";
+.
+ 
+@verb $interior_room:"verbs_for_web" this none this rxd BioGate_wizard
+@program $interior_room:verbs_for_web
+"verbs_for_web( ) -> HTML doc LIST";
+"If player isn't in the room, offer them a hyperlinked 'enter' command.";
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+if (player.location != this)
+  return {"<P><B>Actions:</B><BR>", "<A HREF=\"&LOCAL_LINK;/" + "view" + "/" + tostr(tonum(this)) + "/enter#focus\">Enter</A> " + this:name(1) + "<BR>"};
+endif
+return {};
+"Last modified Sat Aug 12 17:37:01 1995 IDT by EricM (#3264).";
+.
+ 
+@verb $interior_room:"has_url" this none this rxd BioGate_wizard
+@program $interior_room:has_url
+"(C) Copyright 1996 BioGate Partners; All rights reserved.";
+return 1;
+"Last modified Sun Aug 27 04:48:11 1995 IDT by EricM (#3264).";
+.

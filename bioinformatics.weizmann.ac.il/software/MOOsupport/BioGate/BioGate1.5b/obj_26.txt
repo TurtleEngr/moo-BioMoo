@@ -1,0 +1,14 @@
+"Compiled Wizard Utilities (#26) at Fri Jul 18 21:29:43 1997 IDT";
+"  The $web_utils:call_verb_with_other_perms verb is used by the verb";
+"'method_post' on the Character Customizer.  It's a generally useful";
+"verb for other purposes, though.";
+
+ 
+@verb $wiz_utils:"call_verb_with_other_perms" this none this rx BioGate_wizard
+@program $wiz_utils:call_verb_with_other_perms
+"Args are: perms to run with, object, verb, args to pass to it.";
+set_task_perms(caller_perms());
+set_task_perms(args[1]);
+return args[2]:(args[3])(@args[4..length(args)]);
+"Last modified Thu Apr 20 17:37:13 1995 IDT by Gustavo (#2).";
+.
